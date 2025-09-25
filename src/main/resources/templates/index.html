@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <title>EcoSpace</title>
+
+</head>
+<body>
+<div id="main-container">
+    <header id="main-header" th:replace="fragments/commons::nav">
+        <h1 id="main-title">EcoSpace</h1>
+<!--        <nav id="nav-container">-->
+<!--            <a th:href="@{home}" class="nav-button">Home</a>-->
+<!--            <a th:href="@{register}" class="nav-button">Register</a>-->
+<!--            <a th:href="@{login}" class="nav-button">Login</a>-->
+<!--            <a th:href="@{contact}" class="nav-button">Contact Us</a>-->
+<!--            <a th:href="@{maintenance}" class="nav-button">Maintenance</a>-->
+<!--            <a th:href="@{design}" class="nav-button">Design</a>-->
+<!--            <a th:href="@{client}" class="nav-button">Client</a>-->
+<!--            <a th:href="@{projects}" class="nav-button">Projects</a>-->
+<!--            <a th:href="@{add-project}" class="nav-button">Add Project</a>-->
+<!--            <a th:href="@{logout}" class="nav-button">Logout</a>-->
+
+
+<!--        </nav>-->
+    </header>
+
+    <div class="content-section">
+        <h2 class="section-title">About EcoSpace</h2>
+        <p class="section-text">EcoSpace is dedicated to creating sustainable environments and promoting eco-friendly practices. Our mission is to help people live in harmony with nature while maintaining modern comforts.</p>
+        <p class="section-text">We believe that everyone can make a difference in protecting our planet. Join us in our journey towards a greener future.</p>
+    </div>
+
+    <footer id="main-footer">
+        <p>© 2023 EcoSpace. All rights reserved.</p>
+    </footer>
+</div>
+</body>
+</html>

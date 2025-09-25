@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <title>EcoSpace - Maintenance Packages</title>
+
+</head>
+<body>
+<div id="main-container">
+    <header id="main-header" th:replace="fragments/commons::nav">
+        <h1 id="main-title">EcoSpace Maintenance Packages</h1>
+
+
+    </header>
+
+    <div class="content-section">
+        <h2 class="section-title">Maintenance Packages</h2>
+        <nav id="nav-container">
+            <button class="add-button">Add Package</button>
+
+        </nav>
+
+        <div class="packages-container">
+            <div class="package package-2d-basic">
+                <div class="package-header">Monthly Package</div>
+                <div class="package-price">R 1,200</div>
+                <div class="package-features">
+                    <ul>
+                        <li>Weekly site inspection</li>
+                        <li>Basic maintenance services</li>
+                        <li>Plant health check</li>
+                        <li>Irrigation system check</li>
+                        <li>Weed control</li>
+                        <li>Basic pruning</li>
+                    </ul>
+                    <button class="buy-button">Buy Now</button>
+                    <button class="remove-button">Remove Package</button>
+                    <button class="edit-button">Edit</button>
+                </div>
+            </div>
+
+            <div class="package package-6d-standard">
+                <div class="package-header">6-Month Package</div>
+                <div class="package-price">R 6,000</div>
+                <div class="package-features">
+                    <ul>
+                        <li>Everything in Monthly Package</li>
+                        <li>Bi-weekly detailed inspection</li>
+                        <li>Advanced plant care</li>
+                        <li>Soil quality testing</li>
+                        <li>Fertilization service</li>
+                        <li>Pest control management</li>
+                        <li>Seasonal planting</li>
+                    </ul>
+                    <button class="buy-button">Buy Now</button>
+                    <button class="remove-button">Remove Package</button>
+                    <button class="edit-button">Edit</button>
+                </div>
+            </div>
+
+            <div class="package package-1y-premium">
+                <div class="package-header">1-Year Package</div>
+                <div class="package-price">R 10,800</div>
+                <div class="package-features">
+                    <ul>
+                        <li>Everything in 6-Month Package</li>
+                        <li>Monthly comprehensive reports</li>
+                        <li>Priority scheduling</li>
+                        <li>Custom landscape design consultation</li>
+                        <li>Emergency service response</li>
+                        <li>Specialized plant healthcare</li>
+                        <li>4 seasonal clean-ups</li>
+                        <li>10% discount on additional services</li>
+                    </ul>
+                    <button class="buy-button">Buy Now</button>
+                    <button class="remove-button">Remove Package</button>
+                    <button class="edit-button">Edit</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <footer id="main-footer">
+        <p>© 2023 EcoSpace. All rights reserved.</p>
+    </footer>
+</div>
+</body>
+</html>

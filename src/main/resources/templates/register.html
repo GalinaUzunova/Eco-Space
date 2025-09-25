@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <title>EcoSpace - Register</title>
+
+</head>
+<body>
+<div id="main-container">
+    <header id="main-header" th:replace="fragments/commons::nav">
+        <h1 id="main-title">EcoSpace Registration</h1>
+<!--        <nav id="nav-container">-->
+<!--            <a href="index.html" class="nav-button">Home</a>-->
+<!--            <a href="login.html" class="nav-button">Login</a>-->
+<!--            <a href="contact.html" class="nav-button">Contact Us</a>-->
+<!--        </nav>-->
+    </header>
+
+    <div class="content-section">
+        <h2 class="section-title">Create Your Account</h2>
+
+        <form class="form-container">
+            <table class="form-table">
+                <tr>
+                    <td class="form-label">Username:</td>
+                    <td><input type="text" class="form-input" name="username" required></td>
+                </tr>
+                <tr>
+                    <td class="form-label">Email:</td>
+                    <td><input type="email" class="form-input" name="email" required></td>
+                </tr>
+                <tr>
+                    <td class="form-label">Password:</td>
+                    <td><input type="password" class="form-input" name="password" required></td>
+                </tr>
+                <tr>
+                    <td class="form-label">Confirm Password:</td>
+                    <td><input type="password" class="form-input" name="confirm-password" required></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <input type="submit" class="form-submit" value="Register">
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+
+    <footer id="main-footer">
+        <p>© 2023 EcoSpace. All rights reserved.</p>
+    </footer>
+</div>
+</body>
+</html>

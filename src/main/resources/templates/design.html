@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <title>EcoSpace - Design Services</title>
+
+</head>
+<body>
+<div id="main-container">
+    <header id="main-header" th:replace="fragments/commons::nav">
+        <h1 id="main-title">EcoSpace Design Services</h1>
+<!--        <nav id="nav-container">-->
+<!--            <a href="index.html" class="nav-button">Home</a>-->
+<!--            <a href="register.html" class="nav-button">Register</a>-->
+<!--            <a href="login.html" class="nav-button">Login</a>-->
+<!--        </nav>-->
+    </header>
+
+    <div class="content-section">
+        <h2 class="section-title">Professional Landscape Design Packages</h2>
+        <p class="section-text">Choose the perfect design package for your green space project</p>
+
+        <div class="packages-container">
+            <div class="package package-2d-basic">
+                <div class="package-header">2D Basic Package</div>
+                <div class="package-price">R 2,500</div>
+                <div class="package-features">
+                    <ul>
+                        <li>Site analysis and measurement</li>
+                        <li>Basic 2D layout plan</li>
+                        <li>Plant selection guide</li>
+                        <li>Single revision</li>
+                        <li>PDF delivery</li>
+                    </ul>
+                    <button class="buy-button">Select Plan</button>
+                </div>
+            </div>
+
+            <div class="package package-2d-premium">
+                <div class="package-header">2D Premium Package</div>
+                <div class="package-price">R 4,500</div>
+                <div class="package-features">
+                    <ul>
+                        <li>Comprehensive site analysis</li>
+                        <li>Detailed 2D master plan</li>
+                        <li>Planting schedule</li>
+                        <li>Material specifications</li>
+                        <li>3 revisions included</li>
+                        <li>PDF + printed copy</li>
+                    </ul>
+                    <button class="buy-button">Select Plan</button>
+                </div>
+            </div>
+
+            <div class="package package-3d">
+                <div class="package-header">3D Visualization Package</div>
+                <div class="package-price">R 8,900</div>
+                <div class="package-features">
+                    <ul>
+                        <li>Everything in 2D Premium</li>
+                        <li>3D digital model</li>
+                        <li>Photorealistic renderings</li>
+                        <li>Virtual walkthrough</li>
+                        <li>Unlimited revisions</li>
+                        <li>All source files included</li>
+                    </ul>
+                    <button class="buy-button">Select Plan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer id="main-footer">
+        <p>© 2023 EcoSpace. All rights reserved.</p>
+    </footer>
+</div>
+</body>
+</html>

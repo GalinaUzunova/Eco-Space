@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <title>EcoSpace - Contact Us</title>
+
+</head>
+<body>
+<div id="main-container">
+    <header id="main-header"th:replace="fragments/commons::nav">
+        <h1 id="main-title">EcoSpace Contact Us</h1>
+<!--        <nav id="nav-container">-->
+<!--            <a href="index.html" class="nav-button">Home</a>-->
+<!--            <a href="register.html" class="nav-button">Register</a>-->
+<!--            <a href="login.html" class="nav-button">Login</a>-->
+<!--        </nav>-->
+    </header>
+
+    <div class="content-section">
+        <h2 class="section-title">Get in Touch</h2>
+
+        <div class="content-section">
+            <h3 class="section-title">Company Information</h3>
+            <p class="section-text"><strong>Address:</strong> Sandton City, Johannesburg</p>
+            <p class="section-text"><strong>Phone:</strong> +270845002097</p>
+        </div>
+
+        <div class="content-section">
+            <h3 class="section-title">Send us a Message</h3>
+
+            <form class="form-container">
+                <table class="form-table">
+                    <tr>
+                        <td class="form-label">Name:</td>
+                        <td><input type="text" class="form-input" name="name" required></td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">Email:</td>
+                        <td><input type="email" class="form-input" name="email" required></td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">Phone:</td>
+                        <td><input type="tel" class="form-input" name="phone"></td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">Message:</td>
+                        <td><textarea class="form-input" name="message" rows="5" required></textarea></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <input type="submit" class="form-submit" value="Send Message">
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+
+    <footer id="main-footer">
+        <p>© 2023 EcoSpace. All rights reserved.</p>
+    </footer>
+</div>
+</body>
+</html>

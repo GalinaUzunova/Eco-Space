@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <title>EcoSpace - Home</title>
+
+</head>
+<body>
+<div id="main-container">
+    <header id="main-header" th:replace="fragments/commons::nav">
+        <h1 id="main-title">EcoSpace</h1>
+<!--        <nav id="nav-container">-->
+<!--&lt;!&ndash;            <a th:href="@{/home}" class="nav-button">Home</a>&ndash;&gt;-->
+<!--            <a th:href="@{/projects}" class="nav-button">Projects</a>-->
+<!--            <a href="design.html" class="nav-button">Design</a>-->
+<!--            <a href="client.html" class="nav-button">Maintenance Crew</a>-->
+<!--            <a href="add-project.html" class="nav-button">Add Project</a>-->
+<!--        </nav>-->
+    </header>
+
+    <div class="content-section">
+        <h2 class="section-title">Welcome to EcoSpace</h2>
+        <p class="section-text">Manage your eco-friendly projects with our comprehensive tracking system. Monitor progress, assign tasks, and ensure your sustainability initiatives are successful.</p>
+
+        <h3 class="section-title">Our Features</h3>
+        <ul>
+            <li class="section-text">Track project progress and milestones</li>
+            <li class="section-text">Design sustainable solutions</li>
+            <li class="section-text">Manage clients</li>
+            <li class="section-text">Add new projects to the system</li>
+        </ul>
+    </div>
+
+    <footer id="main-footer">
+        <p>© 2023 EcoSpace. All rights reserved.</p>
+    </footer>
+</div>
+</body>
+</html>

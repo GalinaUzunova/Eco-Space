@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <title>EcoSpace - Projects</title>
+
+</head>
+<body>
+<div id="main-container">
+    <header id="main-header" th:replace="fragments/commons::nav">
+        <h1 id="main-title">EcoSpace Projects</h1>
+<!--        <nav id="nav-container">-->
+<!--            <a href="index.html" class="nav-button">Home</a>-->
+<!--            <a href="client.html" class="nav-button">Crew</a>-->
+<!--            <a href="add-project.html" class="nav-button">Add Project</a>-->
+<!--            <a href="login.html" class="nav-button">Login</a>-->
+<!--            <a href="contact.html" class="nav-button">Contact Us</a>-->
+<!--        </nav>-->
+    </header>
+
+    <div class="content-section">
+        <h2 class="section-title">Project Management</h2>
+
+        <div class="project-section">
+            <h3 class="section-title">Requested Projects</h3>
+            <div class="project-category">
+                <table class="project-table">
+                    <tr>
+                        <th>Project Name</th>
+                        <th>Client</th>
+                        <th>Request Date</th>
+                        <th>Type</th>
+                    </tr>
+                    <tr>
+<!--                        <td>Office Green Wall Installation</td>-->
+<!--                        <td>TechCorp Ltd</td>-->
+<!--                        <td>2023-10-15</td>-->
+
+                    </tr>
+                </table>
+            </div >
+            <div class="request">
+
+            </div>
+           <button class="status-button">Approve</button>
+            <button class="status-button">Delete</button>
+        </div>
+
+        <div class="project-section">
+            <h3 class="section-title">Projects in Progress</h3>
+            <div class="project-category">
+                <table class="project-table">
+                    <tr>
+                        <th>Project Name</th>
+                        <th>Start Date</th>
+                        <th>Deadline</th>
+                        <th>Progress</th>
+                        <th>Type</th>
+                    </tr>
+<!--                    <tr>-->
+<!--                        <td>Solar Panel Installation</td>-->
+<!--                        <td>2023-09-10</td>-->
+<!--                        <td>2023-11-15</td>-->
+<!--                        <td>65%</td>-->
+                        <td><button class="status-button">Change Status</button></td>
+<!--                    </tr>-->
+                </table>
+                <div class="inProgress">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer id="main-footer">
+        <p>© 2023 EcoSpace. All rights reserved.</p>
+    </footer>
+</div>
+</body>
+</html>

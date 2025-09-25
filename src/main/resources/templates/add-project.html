@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <title>EcoSpace - Add New Project</title>
+
+</head>
+<body>
+<div id="main-container">
+    <header id="main-header" th:replace="fragments/commons::nav">>
+        <h1 id="main-title">EcoSpace Add New Project</h1>
+<!--        <nav id="nav-container">-->
+<!--            <a href="client.html" class="nav-button">Crew</a>-->
+<!--            <a href="projects.html" class="nav-button">Projects</a>-->
+<!--            <a href="design.html" class="nav-button">Design</a>-->
+<!--            <a href="maintanace.html" class="nav-button">Maintenance</a>-->
+<!--            <a href="login.html" class="nav-button">Log Out</a>-->
+<!--        </nav>-->
+    </header>
+
+    <div class="content-section">
+        <h2 class="section-title">Add New Project</h2>
+
+        <form class="form-container">
+            <table class="form-table">
+                <tr>
+                    <td class="form-label">Project Name:</td>
+                    <td><input type="text" class="form-input" name="name" required></td>
+                </tr>
+                <tr>
+                    <td class="form-label">Client:</td>
+                    <td><input type="text" class="form-input" name="client" required></td>
+                </tr>
+                <tr>
+                    <td class="form-label">Manager:</td>
+                    <td><input type="text" class="form-input" name="manager" required></td>
+                </tr>
+                <tr>
+                    <td class="form-label">Location:</td>
+                    <td><input type="text" class="form-input" name="location" required></td>
+                </tr>
+                <tr>
+                    <td class="form-label">Start Date:</td>
+                    <td><input type="date" class="form-input" name="start_date" required></td>
+                </tr>
+                <tr>
+                    <td class="form-label">Due Date:</td>
+                    <td><input type="date" class="form-input" name="due_date" required></td>
+                </tr>
+                <tr>
+                    <td class="form-label">Type:</td>
+                    <td>
+                        <select class="form-input" name="type" required>
+                            <option value="">Select Project Type</option>
+                            <option value="landscaping">Landscaping</option>
+                            <option value="sustainability">Sustainability</option>
+                            <option value="conservation">Conservation</option>
+                            <option value="restoration">Restoration</option>
+                            <option value="education">Education</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="form-label">Description:</td>
+                    <td><textarea class="form-input" name="description" rows="4"></textarea></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <input type="submit" class="form-submit" value="Add Project">
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+
+    <footer id="main-footer">
+        <p>© 2023 EcoSpace. All rights reserved.</p>
+    </footer>
+</div>
+</body>
+</html>
