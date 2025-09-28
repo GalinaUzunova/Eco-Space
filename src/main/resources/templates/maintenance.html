@@ -1,15 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-    <title>EcoSpace - Maintenance Packages</title>
+<head th:replace="~{fragments/commons::head}">
+
 
 </head>
 <body>
 <div id="main-container">
-    <header id="main-header" th:replace="fragments/commons::nav">
+    <header id="main-header" th:replace="~{fragments/commons::nav}">
         <h1 id="main-title">EcoSpace Maintenance Packages</h1>
 
 
@@ -35,7 +32,7 @@
                         <li>Weed control</li>
                         <li>Basic pruning</li>
                     </ul>
-                    <button class="buy-button">Buy Now</button>
+                    <p class="buy-button"><a th:href ="@{/register}">Select Plan</a></p>
                     <button class="remove-button">Remove Package</button>
                     <button class="edit-button">Edit</button>
                 </div>
@@ -54,7 +51,7 @@
                         <li>Pest control management</li>
                         <li>Seasonal planting</li>
                     </ul>
-                    <button class="buy-button">Buy Now</button>
+                    <p class="buy-button"><a th:href ="@{/register}">Select Plan</a></p>
                     <button class="remove-button">Remove Package</button>
                     <button class="edit-button">Edit</button>
                 </div>
@@ -74,7 +71,7 @@
                         <li>4 seasonal clean-ups</li>
                         <li>10% discount on additional services</li>
                     </ul>
-                    <button class="buy-button">Buy Now</button>
+                    <p class="buy-button"><a th:href ="@{/register}">Select Plan</a></p>
                     <button class="remove-button">Remove Package</button>
                     <button class="edit-button">Edit</button>
                 </div>

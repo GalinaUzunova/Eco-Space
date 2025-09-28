@@ -1,51 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-    <title>EcoSpace - Register</title>
+<head th:replace="~{fragments/commons::head}">
 
 </head>
 <body>
 <div id="main-container">
-    <header id="main-header" th:replace="fragments/commons::nav">
+    <header id="main-header" th:replace="~{fragments/commons::nav}">
         <h1 id="main-title">EcoSpace Registration</h1>
-<!--        <nav id="nav-container">-->
-<!--            <a href="index.html" class="nav-button">Home</a>-->
-<!--            <a href="login.html" class="nav-button">Login</a>-->
-<!--            <a href="contact.html" class="nav-button">Contact Us</a>-->
-<!--        </nav>-->
+
     </header>
 
     <div class="content-section">
         <h2 class="section-title">Create Your Account</h2>
 
-        <form class="form-container">
+        <form class="form-container"  th:method="POST" th:action="@{/register}"
+        th:object="${userDto}">
             <table class="form-table">
+
+                <tr>
+                    <td class="form-label">Subscription Plan:</td>
+                    <td>
+                        <select class="form-input" th:field="*{subscriptionType}" id="subscriptionType"
+                                th:errorclass="'is-invalid alert-danger'" required>
+                            <option value="">-- Choose a Plan --</option>
+                            <option th:each="plan : ${subType}"
+                                    th:value="${plan}"
+                                    th:text="${plan.displayName}">
+                            </option>
+                        </select>
+
+
+                        <span class="invalid-feedback  bg-danger text-light rounded text-danger" style="font-size: 10px"
+                              th:if="${#fields.hasErrors('subscriptionType')}"
+                              th:errorclass="error"
+                              th:errors="*{subscriptionType}">
+
+                        </span>
+
+
+
+                </tr>
                 <tr>
                     <td class="form-label">Username:</td>
-                    <td><input type="text" class="form-input" name="username" required></td>
+                    <td><input type="text" class="form-input"
+                               th:field="*{username}"
+                               id="username"
+                               th:errorclass="'is-invalid alert-danger'" >
+
+                        <span class="invalid-feedback  bg-danger text-light rounded text-danger" style="font-size: 10px"
+                              th:if="${#fields.hasErrors('username')}"
+                              th:errorclass="error"
+                              th:errors="*{username}">
+
+                        </span>
+
+                        </td>
                 </tr>
                 <tr>
                     <td class="form-label">Email:</td>
-                    <td><input type="email" class="form-input" name="email" required></td>
+
+                    <td><input type="email" class="form-input"  id="email"
+                               th:field="*{email}"
+                               th:errorclass="'is-invalid alert-danger'" >
+
+                        <span class="invalid-feedback  bg-danger text-light rounded text-danger" style="font-size: 10px"
+                              th:if="${#fields.hasErrors('email')}"
+                              th:errorclass="error"
+                              th:errors="*{email}" ></span>
+                    </td>
                 </tr>
                 <tr>
                     <td class="form-label">Password:</td>
-                    <td><input type="password" class="form-input" name="password" required></td>
+                    <td><input type="password" class="form-input" id="password"
+                               th:field="*{password}"
+                               th:errorclass="'is-invalid alert-danger'" >
+
+                        <span class="invalid-feedback text-danger" style="font-size: 10px"
+                              th:if="${#fields.hasErrors('password')}"
+                              th:errorclass="error"
+                              th:errors="*{password}" ></span>
+                    </td>
                 </tr>
                 <tr>
                     <td class="form-label">Confirm Password:</td>
-                    <td><input type="password" class="form-input" name="confirm-password" required></td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        <input type="submit" class="form-submit" value="Register">
+                    <td><input type="password" class="form-input"  id= "confirm-password"
+                               th:field="*{confirmPassword}">
+
+
+
+                        <span class="invalid-feedback text-danger" style="font-size: 10px"
+                              th:if="${#fields.hasErrors('confirmPassword')}"
+                              th:errorclass="error"
+                              th:errors="*{confirmPassword}" ></span>
+
+
                     </td>
                 </tr>
+                <tr>
+
+                </tr>
             </table>
+            <div class="button-holder d-flex justify-content-center">
+                <button type="submit" class="form-submit" value="Register">Register</button>
+            </div>
+
         </form>
+
+
     </div>
 
     <footer id="main-footer">

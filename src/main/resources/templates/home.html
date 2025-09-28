@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-    <title>EcoSpace - Home</title>
+<head th:replace="~{fragments/commons::head}">
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <link rel="stylesheet" th:href="@{/css/style.css}">-->
+<!--    <title>EcoSpace - Home</title>-->
 
 </head>
 <body>
 <div id="main-container">
-    <header id="main-header" th:replace="fragments/commons::nav">
+    <header id="main-header" th:replace="~{fragments/commons::nav}">
         <h1 id="main-title">EcoSpace</h1>
 <!--        <nav id="nav-container">-->
 <!--&lt;!&ndash;            <a th:href="@{/home}" class="nav-button">Home</a>&ndash;&gt;-->

@@ -1,21 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-    <title>EcoSpace - Design Services</title>
+<head th:replace="~{fragments/commons::head}">
+
 
 </head>
 <body>
 <div id="main-container">
-    <header id="main-header" th:replace="fragments/commons::nav">
+    <header id="main-header" th:replace="~{fragments/commons::nav}">
         <h1 id="main-title">EcoSpace Design Services</h1>
-<!--        <nav id="nav-container">-->
-<!--            <a href="index.html" class="nav-button">Home</a>-->
-<!--            <a href="register.html" class="nav-button">Register</a>-->
-<!--            <a href="login.html" class="nav-button">Login</a>-->
-<!--        </nav>-->
+
     </header>
 
     <div class="content-section">
@@ -34,7 +27,7 @@
                         <li>Single revision</li>
                         <li>PDF delivery</li>
                     </ul>
-                    <button class="buy-button">Select Plan</button>
+                    <p class="buy-button"><a th:href ="@{/register}">Select Plan</a></p>
                 </div>
             </div>
 
@@ -50,7 +43,7 @@
                         <li>3 revisions included</li>
                         <li>PDF + printed copy</li>
                     </ul>
-                    <button class="buy-button">Select Plan</button>
+                    <p class="buy-button"><a th:href ="@{/register}">Select Plan</a></p>
                 </div>
             </div>
 
@@ -66,7 +59,7 @@
                         <li>Unlimited revisions</li>
                         <li>All source files included</li>
                     </ul>
-                    <button class="buy-button">Select Plan</button>
+                    <p class="buy-button"><a th:href ="@{/register}">Select Plan</a></p>
                 </div>
             </div>
         </div>
