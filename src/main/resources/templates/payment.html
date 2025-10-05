@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head  th:replace="~{fragments/commons::head}">
+    <meta charset="UTF-8">
+
+</head >
+
+<body>
+<div id="main-container">
+    <header id="main-header" th:replace="~{fragments/commons::nav}">
+        <h1 id="main-title">EcoSpace</h1>
+        <h2 id="page-title">Payment Information</h2>
+    </header>
+
+
+        <div class="content-section">
+            <h3 class="section-title">Order Summary</h3>
+
+            <div class="payment-summary">
+                <h4 class="summary-title"th:text="${subscriptionUser.type}">Premium Subscription</h4>
+                <div class="summary-item">
+                    <span>Plan:</span>
+                    <span th:text="${subscriptionUser.namePackage}">Premium Annual</span>
+                </div>
+                <div class="summary-item">
+                    <span>Billing Cycle:</span>
+                    <span>Yearly</span>
+                </div>
+                <div class="summary-item">
+                    <span>Features:</span>
+                    <span th:text="${subscriptionUser.description}">Unlimited Access</span>
+                </div>
+                <div class="summary-total">
+                    <span>Total Amount:</span>
+                    <span th:text="${subscriptionUser.price}">$149.99</span>
+                </div>
+            </div>
+
+            <h3 class="section-title">Payment Information</h3>
+            <p class="section-text">Please enter your payment details below to complete your purchase.</p>
+
+            <form class="payment-form" id="paymentForm" th:method="POST"
+                  th:action="@{/payment/{id}(id=${subscriptionUser.id})}" th:object="${cardDto}"
+
+            >
+                <table class="form-table">
+                    <tr>
+                        <td class="form-label">Card Number:</td>
+                        <td>
+                            <input type="text" class="form-input" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19"
+                            th:field="*{card}" th:errorclass="'is-invalid alert-danger'">
+
+                            <span class="invalid-feedback text-danger" style="font-size: 10px"
+                                  th:if="${#fields.hasErrors('card')}"
+                                  th:errorclass="error"
+                                  th:errors="*{card}" ></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">Cardholder Name:</td>
+                        <td>
+                            <input type="text" class="form-input" id="cardName" placeholder="John Doe"
+                            th:field="*{name}"  th:errorclass="'is-invalid alert-danger'">
+
+                            <span class="invalid-feedback text-danger" style="font-size: 10px"
+                                  th:if="${#fields.hasErrors('name')}"
+                                  th:errorclass="error"
+                                  th:errors="*{name}" ></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">Expiration Date:</td>
+                        <td>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <input type="text" class="expiry-input" id="expiryDate" placeholder="MM/YY" maxlength="5"
+                                    th:field="*{expiresOn}"
+                                           th:errorclass="'is-invalid alert-danger'"
+                                    >
+                                    <span class="invalid-feedback text-danger" style="font-size: 10px"
+                                          th:if="${#fields.hasErrors('expiresOn')}"
+                                          th:errorclass="error"
+                                          th:errors="*{expiresOn}" ></span>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form-label">CVV:</td>
+                        <td>
+                            <input type="text" class="form-input" id="cvv" placeholder="123" maxlength="4"
+                                   th:field="*{cvv}"
+                                   th:errorclass="'is-invalid alert-danger'"
+
+                            >
+                            <span class="invalid-feedback text-danger" style="font-size: 10px"
+                                  th:if="${#fields.hasErrors('cvv')}"
+                                  th:errorclass="error"
+                                  th:errors="*{cvv}" ></span>
+                        </td>
+                    </tr>
+<!--                    <tr>-->
+<!--                        <td class="form-label">Billing Address:</td>-->
+<!--                        <td>-->
+<!--                            <input type="text" class="form-input" id="billingAddress" placeholder="Street Address"-->
+<!--                                   th:field="*{address}"-->
+<!--                                   th:errorclass="'is-invalid alert-danger'"-->
+
+<!--                            >-->
+<!--                            <span class="invalid-feedback text-danger" style="font-size: 10px"-->
+<!--                                  th:if="${#fields.hasErrors('address')}"-->
+<!--                                  th:errorclass="error"-->
+<!--                                  th:errors="*{address}" ></span>-->
+<!--                        </td>-->
+<!--                    </tr>-->
+<!--                    <tr>-->
+<!--                        <td class="form-label">City:</td>-->
+<!--                        <td>-->
+<!--                            <input type="text" class="form-input" id="city" placeholder="City" th>-->
+<!--                        </td>-->
+<!--                    </tr>-->
+<!--                    <tr>-->
+<!--                        <td class="form-label">ZIP/Postal Code:</td>-->
+<!--                        <td>-->
+<!--                            <input type="text" class="form-input" id="zipCode" placeholder="12345">-->
+<!--                        </td>-->
+<!--                    </tr>-->
+<!--                    <tr>-->
+<!--                        <td class="form-label">Country:</td>-->
+<!--                        <td>-->
+<!--                            <select class="form-input" id="country">-->
+<!--                                <option value="">Select Country</option>-->
+<!--                                <option value="US">United States</option>-->
+<!--                                <option value="CA">Canada</option>-->
+<!--                                <option value="UK">United Kingdom</option>-->
+<!--                                <option value="AU">Australia</option>-->
+<!--                                <option value="DE">Germany</option>-->
+<!--                                <option value="FR">France</option>-->
+<!--                            </select>-->
+<!--                        </td>-->
+<!--                    </tr>-->
+                </table>
+
+                <div class="form-actions">
+                    <button type="button" class="cancel-button">Cancel</button>
+                    <button type="submit" class="form-submit">Pay</button>
+                </div>
+            </form>
+        </div>
+
+        <footer id="main-footer">
+            <p>&copy; 2023 SecurePay. All rights reserved. Your payment information is secure and encrypted.</p>
+        </footer>
+    </div>
+
+</body>
+</html>

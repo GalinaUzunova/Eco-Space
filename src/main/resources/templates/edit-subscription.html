@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="~{fragments/commons::head}">
+
+</head>
+<body>
+<div id="main-container">
+    <header id="main-header" th:replace="~{fragments/commons::nav}">
+        <h1 id="main-title">Client Portal</h1>
+        <h2 id="page-title">Add New Subscription Plan</h2>
+
+
+    </header>
+
+    <main>
+        <section class="content-section" >
+            <p class="form-container" >
+                <h3 class="section-title">Edit Subscription Plan</h3>
+
+
+                <form id="subscription-form" class="subscription-form" th:method="PUT"
+                      th:action="@{/edit-subscription/{id}(id=${editedDto.id})}"
+                      th:object="${editedDto}"
+
+                >
+
+                  <textarea th:field="*{id}"></textarea>
+
+
+                    <table class="form-table">
+
+
+                        <tr>
+                            <td class="form-label">Subscription Type:</td>
+                            <td>
+                                <select type="text" id="type" class="form-input" th:field="*{type}"   th:errorclass="'is-invalid alert-danger'" required>
+                                <option value="">-- Choose a Plan --</option>
+                                <option th:each="plan : ${subType}"
+                                        th:value="${plan}"
+                                        th:text="${plan}" >
+                                </option>
+                                </select>
+                                <span class="invalid-feedback  bg-danger text-light rounded text-danger" style="font-size: 10px"
+                                      th:if="${#fields.hasErrors('type')}"
+                                      th:errorclass="error"
+                                      th:errors="*{type}">
+
+                        </span>
+                                <div ></div>
+                            </td>
+
+
+                        </tr>
+                        <tr>
+                            <td class="form-label">Subscription Name:</td>
+                            <td>
+                                <input type="text" id="namePackage" class="form-input"
+                                       placeholder="Enter subscription name"
+                                       th:field="*{namePackage}"
+                                       th:errorclass="'is-invalid alert-danger'" required
+
+
+                                >
+                                <span class="invalid-feedback  bg-danger text-light rounded text-danger" style="font-size: 10px"
+                                      th:if="${#fields.hasErrors('namePackage')}"
+                                      th:errorclass="error"
+                                      th:errors="*{namePackage}">
+
+                        </span>
+                                <div></div>
+
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="form-label">Price:</td>
+                            <td>
+                                <input  type="number" id="price" class="form-input"
+                                        step="0.01" min="0" placeholder="0.00" required
+                                        th:field="*{price}"
+                                        th:errorclass="'is-invalid alert-danger'"
+
+
+                                >
+                                <span class="invalid-feedback  bg-danger text-light rounded text-danger" style="font-size: 10px"
+                                      th:if="${#fields.hasErrors('price')}"
+                                      th:errorclass="error"
+                                      th:errors="*{price}">
+
+                        </span>
+                                <div ></div>
+
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="form-label">Duration:</td>
+                            <td>
+                                <input  type="number" id="subscriptionPeriod"
+                                        class="form-input"
+                                        th:field="*{subscriptionPeriod}" required
+
+
+
+                                >
+
+
+
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div class="description-section">
+                        <h4 class="section-title">Plan Description</h4>
+                        <textarea id="description" class="form-input description-textarea"
+                                  rows="4" placeholder="Enter detailed description of the subscription plan..."
+                                  th:field="*{description}"
+                                  th:errorclass="'is-invalid alert-danger'" required
+
+
+
+                        ></textarea>
+                        <span class="invalid-feedback  bg-danger text-light rounded text-danger" style="font-size: 10px"
+                              th:if="${#fields.hasErrors('description')}"
+                              th:errorclass="error"
+                              th:errors="*{description}">
+
+
+                        </span>
+                        <div ></div>
+
+
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="form-submit" >Save</button>
+
+                    </div>
+
+                </form>
+
+
+        </section>
+    </main>
+
+    <footer id="main-footer">
+        <p>&copy; 2023 Client Portal. All rights reserved.</p>
+    </footer>
+</div>
+
+
+</body>
+</html>

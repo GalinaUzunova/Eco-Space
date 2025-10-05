@@ -1,13 +1,10 @@
 package org.ecospace.model.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.ecospace.model.SubscriptionType;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,8 +27,8 @@ public class UserDto {
 
         @NotBlank
         private String confirmPassword;
-        @NotBlank
-        private SubscriptionType subscriptionType;
+
+
 
 
         }

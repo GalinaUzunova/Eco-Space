@@ -2,7 +2,6 @@ package org.ecospace.model;
 
 import jakarta.persistence.*;
 
-import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 
 
@@ -40,11 +39,16 @@ public class User  extends BaseEntity {
 
     private boolean active;
 
-    @Enumerated(EnumType.STRING)
-    private SubscriptionType subscriptionType;
+    private String packageName;
 
-    @ManyToMany
+    private LocalDateTime created;
+
+    @ManyToMany()
     private List<Project> clientProjects;
+    @ManyToMany(fetch =FetchType.EAGER)
+    private List<Subscription>subscriptions;
+    @OneToOne
+    private UserCard userCard;
 }
 
 

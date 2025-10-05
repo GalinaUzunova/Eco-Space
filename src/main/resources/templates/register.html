@@ -17,29 +17,31 @@
         th:object="${userDto}">
             <table class="form-table">
 
-                <tr>
-                    <td class="form-label">Subscription Plan:</td>
-                    <td>
-                        <select class="form-input" th:field="*{subscriptionType}" id="subscriptionType"
-                                th:errorclass="'is-invalid alert-danger'" required>
-                            <option value="">-- Choose a Plan --</option>
-                            <option th:each="plan : ${subType}"
-                                    th:value="${plan}"
-                                    th:text="${plan.displayName}">
-                            </option>
-                        </select>
+<!--                <tr>-->
+<!--                    <td class="form-label">Subscription Plan:</td>-->
+<!--                    <td>-->
+<!--                        <select class="form-input" th:field="*{packageName}"id="packages"-->
+<!--                                th:errorclass="'is-invalid alert-danger'" required>-->
+<!--                            <option value="">&#45;&#45; Choose a Plan &#45;&#45;</option>-->
+<!--                            <option th:each="plan : ${subsPackage}"-->
+<!--                                    th:value="${plan}"-->
+<!--                                    th:text="${plan}">-->
 
-
-                        <span class="invalid-feedback  bg-danger text-light rounded text-danger" style="font-size: 10px"
-                              th:if="${#fields.hasErrors('subscriptionType')}"
-                              th:errorclass="error"
-                              th:errors="*{subscriptionType}">
-
-                        </span>
+<!--                            </option>-->
+<!--                        </select>-->
 
 
 
-                </tr>
+<!--                        <span class="invalid-feedback  bg-danger text-light rounded text-danger" style="font-size: 10px"-->
+<!--                              th:if="${#fields.hasErrors('packageName')}"-->
+<!--                              th:errorclass="error"-->
+<!--                              th:errors="*{packageName}">-->
+
+<!--                        </span>-->
+
+
+
+<!--                </tr>-->
                 <tr>
                     <td class="form-label">Username:</td>
                     <td><input type="text" class="form-input"

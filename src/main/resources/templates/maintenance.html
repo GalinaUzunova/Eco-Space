@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head th:replace="~{fragments/commons::head}">
 
 
@@ -12,35 +12,32 @@
 
     </header>
 
-    <div class="content-section">
+    <div class="content-section"
+    >
         <h2 class="section-title">Maintenance Packages</h2>
         <nav id="nav-container">
-            <button class="add-button">Add Package</button>
+
 
         </nav>
 
         <div class="packages-container">
-            <div class="package package-2d-basic">
-                <div class="package-header">Monthly Package</div>
-                <div class="package-price">R 1,200</div>
+            <div class="package package-2d-basic" th:each="sub : ${maintenanceSubscriptions}">
+                <div class="package-header" th:text="${sub.namePackage}" ></div>
+                <div class="package-price" >R <span th:text="${sub.price}"></span></div>
                 <div class="package-features">
-                    <ul>
-                        <li>Weekly site inspection</li>
-                        <li>Basic maintenance services</li>
-                        <li>Plant health check</li>
-                        <li>Irrigation system check</li>
-                        <li>Weed control</li>
-                        <li>Basic pruning</li>
+                    <ul class="description-ul" th:text="${sub.description}">
+
                     </ul>
-                    <p class="buy-button"><a th:href ="@{/register}">Select Plan</a></p>
-                    <button class="remove-button">Remove Package</button>
-                    <button class="edit-button">Edit</button>
+                    <p class="buy-button"><a th:href ="@{/payment/{id}(id=${sub.getId()})}">Select Plan</a></p>
+                    <p><a class="edit-button" th:href="@{/edit-subscription/{id}(id=${sub.getId()})}">Edit</a></p>
+                    <p><a class="remove-button" th:href="@{/edit-subscription/remove/{id}(id=${sub.getId()})}">Remove Package</a></p>
+
                 </div>
             </div>
 
             <div class="package package-6d-standard">
                 <div class="package-header">6-Month Package</div>
-                <div class="package-price">R 6,000</div>
+                <div class="package-price">R 6000</div>
                 <div class="package-features">
                     <ul>
                         <li>Everything in Monthly Package</li>
@@ -53,13 +50,13 @@
                     </ul>
                     <p class="buy-button"><a th:href ="@{/register}">Select Plan</a></p>
                     <button class="remove-button">Remove Package</button>
-                    <button class="edit-button">Edit</button>
+                    <p><a class="edit-button"th:href="@{edit-subscription}">Edit</a></p>
                 </div>
             </div>
 
             <div class="package package-1y-premium">
                 <div class="package-header">1-Year Package</div>
-                <div class="package-price">R 10,800</div>
+                <div class="package-price">R 10800</div>
                 <div class="package-features">
                     <ul>
                         <li>Everything in 6-Month Package</li>
@@ -73,7 +70,7 @@
                     </ul>
                     <p class="buy-button"><a th:href ="@{/register}">Select Plan</a></p>
                     <button class="remove-button">Remove Package</button>
-                    <button class="edit-button">Edit</button>
+                   <p> <a class="edit-button" th:href="@{edit-subscription}">Edit</a> </p>
                 </div>
             </div>
         </div>
@@ -85,5 +82,6 @@
         <p>© 2023 EcoSpace. All rights reserved.</p>
     </footer>
 </div>
+<script th:src="@{js/client-profile.js}"></script>
 </body>
 </html>

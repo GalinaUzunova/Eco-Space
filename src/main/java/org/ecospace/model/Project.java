@@ -29,8 +29,8 @@ public class Project extends BaseEntity{
     private String description;
 
     private String status;
-    @Enumerated(EnumType.STRING)
-    private SubscriptionType type;
+
+    private String type;
 
   @ManyToOne
     private User client;

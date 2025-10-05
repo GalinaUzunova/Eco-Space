@@ -1,75 +1,59 @@
-<!DOCTYPE html>
-<html lang="en">
-<head th:replace="~{fragments/commons::head}">
 
-</head>
-<body>
-<div id="main-container">
-    <header id="main-header" th:replace="~{fragments/commons::nav}">
-        <h1 id="main-title">EcoSpace Crew Management</h1>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head th:replace="~{fragments/commons::head}">
 
-    </header>
+    </head>
+    <body>
+    <div id="main-container">
+        <header id="main-header" th:replace="~{fragments/commons::nav}">
+            <h1 id="main-title">Client Portal</h1>
+            <h2 id="page-title">Profile & Subscriptions</h2>
+        </header>
 
-    <div class="content-section">
-        <h2 class="section-title">Crew Management</h2>
+        <main>
+            <section class="content-section">
+                <div class="profile-container">
+                    <div class="profile-image-container">
+                        <img id="profile-image" class="profile-image" src="https://via.placeholder.com/150" alt="Profile Image">
+                        <input type="file" id="image-upload" accept="image/*" style="display: none;">
+                        <button class="profile-image-upload" id="upload-button">+</button>
+                    </div>
+                    <h2 id="client-name" class="profile-name" th:text="${user.username}">John Doe</h2>
+                </div>
 
-        <h3 class="section-title">Select Client</h3>
-        <select class="form-input" name="crew_member">
-            <option value="">-- Select  --</option>
-<!--            <option value="new">+ Add New Crew Member</option>-->
+                <div th:each="subscription :${user.getSubscriptions()}" class="subscription-section">
+                    <h3 class="section-title" >My Subscriptions</h3>
+                    <p th:text="${subscription.namePackage}"></p>
+                    <p> Expires On: <span th:text="${subscription.expiresOn}"></span></p> </div>
 
-        </select>
+                 <div>
+                    <p class="section-text">Manage your current subscriptions and add new ones.</p>
 
-        <br><br>
 
-<!--        <form class="form-container">-->
-<!--            <table class="form-table">-->
-<!--                <tr>-->
-<!--                    <td class="form-label">First Name:</td>-->
-<!--                    <td><input type="text" class="form-input" name="first_name" required></td>-->
-<!--                </tr>-->
-<!--                <tr>-->
-<!--                    <td class="form-label">Surname:</td>-->
-<!--                    <td><input type="text" class="form-input" name="surname" required></td>-->
-<!--                </tr>-->
-<!--                <tr>-->
-<!--                    <td class="form-label">Email:</td>-->
-<!--                    <td><input type="email" class="form-input" name="email" required></td>-->
-<!--                </tr>-->
-<!--                <tr>-->
-<!--                    <td class="form-label">Phone:</td>-->
-<!--                    <td><input type="tel" class="form-input" name="phone" required></td>-->
-<!--                </tr>-->
-<!--&lt;!&ndash;                <tr>&ndash;&gt;-->
-<!--&lt;!&ndash;                    <td class="form-label">Passkey:</td>&ndash;&gt;-->
-<!--&lt;!&ndash;                    <td><input type="password" class="form-input" name="passkey" required></td>&ndash;&gt;-->
-<!--&lt;!&ndash;                </tr>&ndash;&gt;-->
-<!--                <tr>-->
-<!--                    <td class="form-label">Status:</td>-->
-<!--                    <td>-->
-<!--                        <select class="form-input" name="status" required>-->
-<!--                            <option value="">Select Status</option>-->
-<!--&lt;!&ndash;                            <option value="active">Active</option>&ndash;&gt;-->
-<!--&lt;!&ndash;                            <option value="inactive">Inactive</option>&ndash;&gt;-->
-<!--&lt;!&ndash;                            <option value="on_leave">On Leave</option>&ndash;&gt;-->
-<!--&lt;!&ndash;                            <option value="training">Training</option>&ndash;&gt;-->
-<!--                        </select>-->
-<!--                    </td>--
-              </tr>-->
-<!--                <tr>-->
-<!--                    <td colspan="2">-->
-        <button type="submit" class="form-submit" value="Delete">Delete</button>
-        <button type="submit" class="form-submit" value="Update">Update</button>
+                    <select id="subscription-dropdown" class="subscription-dropdown" >
+                        <option value="">-- Select a subscription --</option>
+                        <option th:each=" subs :${subsPackage}"
+                                th:value="${subs}"
+                                th:text="${subs}">
 
-<!--                    </td>-->
-<!--                </tr>-->
-<!--            </table>-->
-<!--        </form>-->
+                        </option>
+
+                    </select>
+
+                    <div class="subscription-actions">
+                        <button id="renew-button" class="action-button renew-button">Renew Subscription</button>
+                        <button id="add-subscription-button" class="action-button add-subscription-btn">Add New Subscription</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer id="main-footer">
+            <p>&copy; 2023 Client Portal. All rights reserved.</p>
+        </footer>
     </div>
 
-    <footer id="main-footer">
-        <p>© 2023 EcoSpace. All rights reserved.</p>
-    </footer>
-</div>
-</body>
-</html>
+    <script th:src="@{js/client-profile.js}"></script>
+    </body>
+    </html>

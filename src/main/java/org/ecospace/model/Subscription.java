@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 
+import java.sql.Blob;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
@@ -27,9 +28,11 @@ public class Subscription extends BaseEntity {
     private LocalDateTime createdOn;
     @Column(name = "expire_date")
     private LocalDateTime expiresOn;
+    @Column( nullable = false ,columnDefinition = "Blob")
+    private String description;
 
       @Column(name = "subscription_period")
-     private SubscriptionPeriod subscriptionPeriod;
+     private String subscriptionPeriod;
 
     private boolean isActive;
     @ManyToOne

@@ -11,29 +11,27 @@
 
     </header>
 
-    <div class="content-section">
+    <div class="content-section" >
         <h2 class="section-title">Professional Landscape Design Packages</h2>
         <p class="section-text">Choose the perfect design package for your green space project</p>
 
-        <div class="packages-container">
-            <div class="package package-2d-basic">
-                <div class="package-header">2D Basic Package</div>
-                <div class="package-price">R 2,500</div>
+        <div class="packages-container" >
+            <div class="package package-2d-basic"  th:each="design : ${byDesign}">
+                <div class="package-header" th:text="${design.namePackage}"></div>
+                <div class="package-price">R <span th:text="${design.price}"}></span></div>
                 <div class="package-features">
-                    <ul>
-                        <li>Site analysis and measurement</li>
-                        <li>Basic 2D layout plan</li>
-                        <li>Plant selection guide</li>
-                        <li>Single revision</li>
-                        <li>PDF delivery</li>
+                    <ul class="description-ul" th:text="${design.description}">
+
                     </ul>
                     <p class="buy-button"><a th:href ="@{/register}">Select Plan</a></p>
+                    <p><a class="edit-button" th:href="@{edit-subscription/{id}(id=*{design.getId()})}">Edit</a></p>
+                    <button class="remove-button">Remove Package</button>
                 </div>
             </div>
 
             <div class="package package-2d-premium">
                 <div class="package-header">2D Premium Package</div>
-                <div class="package-price">R 4,500</div>
+                <div class="package-price">R 4500</div>
                 <div class="package-features">
                     <ul>
                         <li>Comprehensive site analysis</li>
@@ -44,12 +42,14 @@
                         <li>PDF + printed copy</li>
                     </ul>
                     <p class="buy-button"><a th:href ="@{/register}">Select Plan</a></p>
+                    <button class="edit-button">Edit Package</button>
+                    <button class="remove-button">Remove Package</button>
                 </div>
             </div>
 
             <div class="package package-3d">
                 <div class="package-header">3D Visualization Package</div>
-                <div class="package-price">R 8,900</div>
+                <div class="package-price">R 8900</div>
                 <div class="package-features">
                     <ul>
                         <li>Everything in 2D Premium</li>
@@ -69,5 +69,6 @@
         <p>© 2023 EcoSpace. All rights reserved.</p>
     </footer>
 </div>
+<script th:src="@{js/client-profile.js}"></script>
 </body>
 </html>
