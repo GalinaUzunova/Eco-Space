@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.ecospace.model.SubscriptionType;
 
-import java.time.LocalDateTime;
+
 import java.util.UUID;
 
 @NoArgsConstructor

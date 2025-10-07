@@ -18,7 +18,7 @@
         <div class="packages-container" >
             <div class="package package-2d-basic"  th:each="design : ${byDesign}">
                 <div class="package-header" th:text="${design.namePackage}"></div>
-                <div class="package-price">R <span th:text="${design.price}"}></span></div>
+                <div class="package-price">R <span th:text="${design.price}"> </span></div>
                 <div class="package-features">
                     <ul class="description-ul" th:text="${design.description}">
 

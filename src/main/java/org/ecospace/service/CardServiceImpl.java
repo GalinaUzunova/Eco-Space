@@ -6,7 +6,7 @@ import org.ecospace.model.User;
 import org.ecospace.model.UserCard;
 import org.ecospace.model.dto.UserCardDto;
 import org.ecospace.repository.CardRepository;
-import org.ecospace.repository.SubscriptionRepository;
+
 import org.ecospace.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

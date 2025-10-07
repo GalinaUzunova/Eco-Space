@@ -27,9 +27,9 @@ public class Subscription extends BaseEntity {
 
     @Column( nullable = false ,columnDefinition = "Blob")
     private String description;
-    @Column(name = "created_on")
+
     private LocalDateTime createdOn;
-    @Column(name = "expire")
+
     private LocalDateTime expiresOn;
     private boolean isActive;
 
