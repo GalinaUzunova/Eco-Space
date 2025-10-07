@@ -24,19 +24,15 @@ public class Subscription extends BaseEntity {
     private String namePackage;
     @Column(nullable = false)
     private Double price;
-    @Column(name = "data_created")
-    private LocalDateTime createdOn;
-    @Column(name = "expire_date")
-    private LocalDateTime expiresOn;
+
     @Column( nullable = false ,columnDefinition = "Blob")
     private String description;
-
-      @Column(name = "subscription_period")
-     private String subscriptionPeriod;
-
+    @Column(name = "created_on")
+    private LocalDateTime createdOn;
+    @Column(name = "expire")
+    private LocalDateTime expiresOn;
     private boolean isActive;
-    @ManyToOne
-    private User client;
+
 
 
 }

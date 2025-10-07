@@ -5,8 +5,8 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.ecospace.model.Subscription;
 import org.ecospace.model.User;
-import org.ecospace.model.UserCard;
 import org.ecospace.model.dto.LoginDto;
+import org.ecospace.model.dto.SubscriptionDtos;
 import org.ecospace.model.dto.UserCardDto;
 import org.ecospace.model.dto.UserDto;
 import org.ecospace.service.CardServiceImpl;
@@ -34,22 +34,29 @@ public class UserController {
     private final SubscriptionServiceImpl subscriptionService;
     private final CardServiceImpl cardService;
 
-   @ModelAttribute("subsPackage")
-   private List<String> getNamePackige(){
-       return subscriptionService.getSubscriptionName();
-   }
+    @ModelAttribute("subscriptionDto")
+    private SubscriptionDtos get() {
+        return new SubscriptionDtos();
+    }
+
+//    @ModelAttribute("subsPackage")
+//    private List<String> getNamePackige() {
+//        return subscriptionService.getSubscriptionName();
+//    }
+
     @ModelAttribute("userDto")
     private UserDto create() {
         return new UserDto();
     }
+
     @ModelAttribute("loginDto")
-    private LoginDto createLogin(){
+    private LoginDto createLogin() {
         return new LoginDto();
     }
 
     @ModelAttribute("cardDto")
-    private UserCardDto cardDto(){
-       return new UserCardDto();
+    private UserCardDto cardDto() {
+        return new UserCardDto();
     }
 
 
@@ -89,9 +96,8 @@ public class UserController {
             return "redirect:/register";
 
 
-
         } else {
-           userService.userRegister(userDto);
+            userService.userRegister(userDto);
             return "login";
         }
 
@@ -100,16 +106,16 @@ public class UserController {
 
     @PostMapping("/login")
 
-    public String doLogin(@Valid LoginDto loginDto, BindingResult bindingResult, RedirectAttributes redirectAttributes, HttpSession httpSession){
+    public String doLogin(@Valid LoginDto loginDto, BindingResult bindingResult, RedirectAttributes redirectAttributes, HttpSession httpSession) {
 
-        if(bindingResult.hasErrors()){
-            redirectAttributes.addFlashAttribute("loginDto",loginDto);
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("loginDto", loginDto);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.loginDto", bindingResult);
 
             return "redirect:/login";
         }
 
-        User user=userService.login(loginDto);
+        User user = userService.login(loginDto);
         httpSession.setAttribute("userId", user.getId());
 
         return "redirect:/client";
@@ -125,58 +131,77 @@ public class UserController {
     }
 
 
-
     @GetMapping("/client")
 
-    public String viewClient(HttpSession session,Model model) {
+    public String viewClient(Model model, HttpSession session) {
 
-        UUID id=(UUID) session.getAttribute("userId");
-        User user=userService.byId(id);
-        if(user==null){
-            return "redirect:/login";
-        }
+        UUID id = (UUID) session.getAttribute("userId");
+        User user = userService.byId(id);
+
+        List<Subscription> clientSubs = this.userService.getClentSubs(id);
+        model.addAttribute("clientSubs", clientSubs);
         model.addAttribute("user", user);
+        clientSubs.forEach(System.out::println
+        );
 
-       return "client";
+
+        return "client";
     }
 
     @GetMapping("/logout")
 
-    public String logout(HttpSession session){
+    public String logout(HttpSession session) {
 
-       session.invalidate();
+        session.invalidate();
 
-       return "redirect:/";
+        return "redirect:/";
 
     }
 
     @GetMapping("/payment/{id}")
 
-    public String getPayment(@PathVariable ("id") UUID id, Model model,HttpSession session){
-        if (session == null || session.getAttribute("userId") == null) {
-            throw new RuntimeException("You need to have account! Please register first!");
+    private String getPayment(@PathVariable("id") UUID id, Model model) {
+
+        Subscription subscriptionUser = subscriptionService.byId(id);
+        model.addAttribute("subscriptionUser", subscriptionUser);
+
+        return "payment";
+    }
+
+    @PostMapping("/client/renew/")
+
+    private String getPage(HttpSession httpSession, @Valid SubscriptionDtos subscriptionDto, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("subscriptionDto", subscriptionDto);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.subscriptionDto", bindingResult);
+
+            return "client";
 
         }
+      this.userService.renew(httpSession,subscriptionDto);
 
-        Subscription subscriptionUser=subscriptionService.byId(id);
-        model.addAttribute("subscriptionUser",subscriptionUser);
-
-       return "payment";
+        return "successes";
     }
+
+
     @PostMapping("/payment/{id}")
 
-    private String doPayment(@PathVariable("id") UUID id,@Valid UserCardDto cardDto,BindingResult bindingResult,RedirectAttributes redirectAttributes,HttpSession httpSession){
+    private String doPayment(@PathVariable("id") UUID id, @Valid UserCardDto cardDto, BindingResult bindingResult, RedirectAttributes redirectAttributes, HttpSession httpSession) {
 
-       if(bindingResult.hasErrors()){
-           redirectAttributes.addFlashAttribute("cardDto",cardDto);
-           redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.cardDto", bindingResult);
-           return "redirect:/payment/"+id ;
-       }
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("cardDto", cardDto);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.cardDto", bindingResult);
+            return "redirect:/payment/" + id;
+        }
 
-     this.cardService.create(httpSession,cardDto,id);
-       return "redirect:/client";
+        this.cardService.create(httpSession, cardDto, id);
+        return "redirect:/client";
     }
-
-
-
 }
+
+
+
+
+
+

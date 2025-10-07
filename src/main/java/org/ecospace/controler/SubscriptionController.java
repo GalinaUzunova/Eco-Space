@@ -1,5 +1,6 @@
 package org.ecospace.controler;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.ecospace.model.Subscription;
 import org.ecospace.model.SubscriptionType;
@@ -93,6 +94,8 @@ public class SubscriptionController {
 
         return "maintenance";
     }
+
+
 
 
     @GetMapping("/edit-subscription/{id}")

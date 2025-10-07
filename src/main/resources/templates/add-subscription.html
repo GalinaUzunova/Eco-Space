@@ -67,8 +67,11 @@
                             <td class="form-label">Price:</td>
                             <td>
                                 <input  type="number" id="price" class="form-input"
-                                       step="0.01" min="0" placeholder="0.00" th:field="*{price}"
+                                        step="1"
+                                        max="0"
+                                        th:field="*{price}"
                                        th:errorclass="'is-invalid alert-danger'"
+
 
                                 >
 
@@ -80,30 +83,13 @@
                         </span>
                             </td>
                         </tr>
-                        <tr>
-                            <td class="form-label">Duration:</td>
-                            <td>
-                                <input  type="number" id="subscriptionPeriod"
-                                        class="form-input"
-                                        th:field="*{subscriptionPeriod}"
-                                        th:errorclass="'is-invalid alert-danger'"
-                                >
-                                <span class="invalid-feedback  bg-danger text-light rounded text-danger" style="font-size: 10px"
-                                      th:if="${#fields.hasErrors('subscriptionPeriod')}"
-                                      th:errorclass="error"
-                                      th:errors="*{subscriptionPeriod}">
 
-                        </span>
-
-
-                            </td>
-                        </tr>
                     </table>
 
                     <div class="description-section">
                         <h4 class="section-title">Plan Description</h4>
                         <textarea id="description" class="form-input description-textarea"
-                                  rows="4" placeholder="Enter detailed description of the subscription plan..."
+                                  rows="4" placeholder="Enter detailed description of the subscription plan.Use . to add new line."
                                   th:field="*{description}"
                                   th:errorclass="'is-invalid alert-danger'"
 

@@ -20,7 +20,7 @@ import java.util.List;
 @Table(name = "users")
 
 public class User  extends BaseEntity {
-    @Column(nullable = false,unique = true)
+    @Column(nullable = false)
     private String username;
 
     @Column(nullable = false)
@@ -43,9 +43,10 @@ public class User  extends BaseEntity {
 
     private LocalDateTime created;
 
-    @ManyToMany()
+    @OneToMany
     private List<Project> clientProjects;
-    @ManyToMany(fetch =FetchType.EAGER)
+
+    @OneToMany (fetch =FetchType.EAGER)
     private List<Subscription>subscriptions;
     @OneToOne
     private UserCard userCard;

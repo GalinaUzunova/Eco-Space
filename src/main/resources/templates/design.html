@@ -23,9 +23,19 @@
                     <ul class="description-ul" th:text="${design.description}">
 
                     </ul>
-                    <p class="buy-button"><a th:href ="@{/register}">Select Plan</a></p>
+                    <a class="buy-button"
+                            th:if="${session.userId != null}"
+                            th:href ="@{/payment/{id}(id=*{design.getId()})}">Buy Now</a>
+
+                    <a th:unless="${session.userId}"
+                       th:href="@{/register}"
+                       class="buy-button">
+                        Select Plan
+                    </a>
+
+
                     <p><a class="edit-button" th:href="@{edit-subscription/{id}(id=*{design.getId()})}">Edit</a></p>
-                    <button class="remove-button">Remove Package</button>
+                    <a class="remove-button" th:href="@{/edit-subscription/remove/{id}(id=${design.id})}">Remove Package</a>
                 </div>
             </div>
 

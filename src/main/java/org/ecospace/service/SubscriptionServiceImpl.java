@@ -27,13 +27,11 @@ public class SubscriptionServiceImpl {
     @Transactional
     public void addNewSubscription(AddSubDto subDto) {
 
-
         Subscription subscription =
                 Subscription.builder()
                         .type(subDto.getType())
                         .price(subDto.getPrice())
                         .namePackage(subDto.getNamePackage())
-                        .createdOn(LocalDateTime.now())
                         .isActive(true)
                         .description(subDto.getDescription())
                         .build();
@@ -50,35 +48,35 @@ public class SubscriptionServiceImpl {
             maintanaceSubscriptions.forEach(m->{
                 MaintenanceSubDto dto=new MaintenanceSubDto();
                 dto.setId(m.getId());
-                dto.setDescription(m.getNamePackage());
                 dto.setPrice(m.getPrice());
                 dto.setDescription(m.getDescription());
                 dto.setNamePackage(m.getNamePackage());
+                dto.setType(m.getType());
+
                 byMaintanace.add(dto);
 
             });
-
             return byMaintanace;
         }
-        throw new RuntimeException("No subscriptions");
+        return new ArrayList<>();
     }
 
 
 
-    public List<String> getSubscriptionName() {
-        List<Subscription> activeSubscriptions = subscriptionRepository.findAll();
-        List<String> subscriptionNames = new ArrayList<>();
-        if (!activeSubscriptions.isEmpty()) {
-            activeSubscriptions.forEach(s -> {
-                String name = s.getNamePackage();
-                subscriptionNames.add(name);
-            });
+//    public List<String> getSubscriptionName() {
+//        List<Subscription> activeSubscriptions = subscriptionRepository.findAll();
+//        List<String> subscriptionNames = new ArrayList<>();
+//        if (!activeSubscriptions.isEmpty()) {
+//            activeSubscriptions.forEach(s -> {
+//                String name = s.getNamePackage();
+//                subscriptionNames.add(name);
+//            });
+//            return subscriptionNames;
+//        }
+//        return new ArrayList<>();
+//
 
-
-        }
-        return subscriptionNames;
-
-    }
+//    }
 
     @Transactional
     public void editSubscription(UUID id, EditSubDto edited) {
@@ -89,7 +87,6 @@ public class SubscriptionServiceImpl {
 
             subscription.setType(edited.getType());
             subscription.setNamePackage(edited.getNamePackage());
-            subscription.setSubscriptionPeriod(edited.getSubscriptionPeriod());
             subscription.setPrice(edited.getPrice());
             subscription.setDescription(edited.getDescription());
             subscription.setActive(true);
@@ -105,7 +102,7 @@ public class SubscriptionServiceImpl {
             return byId.get();
 
         }
-        throw new RuntimeException("Package dost exist");
+        throw new RuntimeException("Package doesn't exist");
     }
 
     public List<DesignSubscriptionDto>getDesignSubscriptions() {
@@ -124,7 +121,7 @@ public class SubscriptionServiceImpl {
             });
             return designSubs;
         }
-        return null;
+        return new ArrayList<>();
     }
 
     public void delete(UUID id){
@@ -135,24 +132,11 @@ public class SubscriptionServiceImpl {
 
     }
 
-    public List<Subscription>exsistingList(){
-
-        return this.subscriptionRepository.findAll();
-    }
-
-    public Subscription byName(String name){
-
-    Optional<Subscription>byName=this.subscriptionRepository.findByNamePackage(name);
-    if(byName.isEmpty()){
-        throw new RuntimeException("No such package");
-    }
-    return byName.get();
-    }
 
 
-    public List<Subscription> getAllSubscriptionByUserId(UUID id) {
 
-     return this.subscriptionRepository.findAllByClientId(id);
 
-    }
+
+
+
 }

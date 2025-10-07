@@ -23,8 +23,7 @@ public class AddSubDto {
     @NotNull(message = "Field cant be empty")
     @Positive(message = "Price must be a positive number!")
     private double price;
-    @NotBlank(message = "Subscription period is required!")
-    private String subscriptionPeriod;
+
     @NotBlank
     private String description;
 }

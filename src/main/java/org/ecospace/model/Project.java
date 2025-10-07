@@ -32,8 +32,7 @@ public class Project extends BaseEntity{
 
     private String type;
 
-  @ManyToOne
-    private User client;
+
 
 
 }

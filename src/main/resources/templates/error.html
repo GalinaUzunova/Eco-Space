@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Failed</title>
+    <link rel="stylesheet" th:href="@{/css/succsses.css}">
+
+</head>
+<body>
+<div class="error-container">
+    <div class="error-icon">✕</div>
+    <h1 class="error-title">Payment Failed</h1>
+    <p class="error-message">
+        We're sorry, but your payment could not be processed.
+        This could be due to insufficient funds, invalid card details,
+        or a temporary issue with your bank.
+    </p>
+
+    <div class="error-details">
+        <strong>Possible reasons:</strong>
+        <ul>
+            <li>Insufficient funds</li>
+            <li>Invalid card information</li>
+            <li>Card expired</li>
+            <li>Bank declined the transaction</li>
+            <li>Technical issue</li>
+        </ul>
+    </div>
+
+    <div class="button-group">
+        <a href="/payment" class="btn-retry">Try Again</a>
+        <a href="/client" class="btn-back">Return to Client Page</a>
+    </div>
+
+    <p style="margin-top: 20px; font-size: 14px; color: #6c757d;">
+        Need help? <a href="mailto:support@yourcompany.com" style="color: #dc3545;">Contact Support</a>
+    </p>
+</div>
+</body>
+</html>

@@ -1,59 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="~{fragments/commons::head}">
 
-    <!DOCTYPE html>
-    <html lang="en">
-    <head th:replace="~{fragments/commons::head}">
+</head>
+<body>
+<div id="main-container">
+    <header id="main-header" th:replace="~{fragments/commons::nav}">
+        <h1 id="main-title">Client Portal</h1>
+        <h2 id="page-title">Profile & Subscriptions</h2>
+    </header>
 
-    </head>
-    <body>
-    <div id="main-container">
-        <header id="main-header" th:replace="~{fragments/commons::nav}">
-            <h1 id="main-title">Client Portal</h1>
-            <h2 id="page-title">Profile & Subscriptions</h2>
-        </header>
-
-        <main>
-            <section class="content-section">
-                <div class="profile-container">
-                    <div class="profile-image-container">
-                        <img id="profile-image" class="profile-image" src="https://via.placeholder.com/150" alt="Profile Image">
-                        <input type="file" id="image-upload" accept="image/*" style="display: none;">
-                        <button class="profile-image-upload" id="upload-button">+</button>
-                    </div>
-                    <h2 id="client-name" class="profile-name" th:text="${user.username}">John Doe</h2>
+    <main>
+        <section class="content-section">
+            <div class="profile-container">
+                <div class="profile-image-container">
+                    <img id="profile-image" class="profile-image" src="https://via.placeholder.com/150"
+                         alt="Profile Image">
+                    <input type="file" id="image-upload" accept="image/*" style="display: none;">
+                    <button class="profile-image-upload" id="upload-button">+</button>
                 </div>
-
-                <div th:each="subscription :${user.getSubscriptions()}" class="subscription-section">
-                    <h3 class="section-title" >My Subscriptions</h3>
-                    <p th:text="${subscription.namePackage}"></p>
-                    <p> Expires On: <span th:text="${subscription.expiresOn}"></span></p> </div>
-
-                 <div>
-                    <p class="section-text">Manage your current subscriptions and add new ones.</p>
+                <h2 id="client-name" class="profile-name" th:text="${user.username}">John Doe</h2>
+            </div>
 
 
-                    <select id="subscription-dropdown" class="subscription-dropdown" >
+            <form class="subscription-section"  th:method="POST" th:action="@{/client/renew}"
+                  th:object="${subscriptionDto}">
+                <h3 class="section-title">My Subscriptions</h3>
+                <p class="section-text">Manage your current subscriptions and add new ones.</p>
+
+                <div>
+
+                    <select id="subscription-dropdown" class="subscription-dropdown"
+                            th:field="*{id}"
+                            th:errorclass="'is-invalid alert-danger'"
+                    >
                         <option value="">-- Select a subscription --</option>
-                        <option th:each=" subs :${subsPackage}"
-                                th:value="${subs}"
-                                th:text="${subs}">
-
+                        <option th:each="sub : ${clientSubs}"
+                                th:value="${sub.id}"
+                                th:text="|${sub.namePackage} -
+                                      Price: ${sub.price} -
+                                      Expires On: ${#temporals.format(sub.expiresOn, 'dd/MM/yyyy')}|">
                         </option>
-
                     </select>
+                    <span class="invalid-feedback text-danger" style="font-size: 10px"
+                          th:if="${#fields.hasErrors('id')}"
+                          th:errorclass="error"
+                          th:errors="*{id}"></span>
 
-                    <div class="subscription-actions">
-                        <button id="renew-button" class="action-button renew-button">Renew Subscription</button>
-                        <button id="add-subscription-button" class="action-button add-subscription-btn">Add New Subscription</button>
-                    </div>
+                <div class="subscription-actions">
+                    <a id="renew-button" class="action-button renew-button" th:href="@{/client/renew}">Renew
+                        Subscription</a>
                 </div>
-            </section>
-        </main>
+                </div>
+            </form>
 
-        <footer id="main-footer">
-            <p>&copy; 2023 Client Portal. All rights reserved.</p>
-        </footer>
-    </div>
 
-    <script th:src="@{js/client-profile.js}"></script>
-    </body>
-    </html>
+
+        </section>
+    </main>
+
+    <footer id="main-footer">
+        <p>&copy; 2023 Client Portal. All rights reserved.</p>
+    </footer>
+</div>
+
+<script th:src="@{js/client-profile.js}"></script>
+</body>
+</html>

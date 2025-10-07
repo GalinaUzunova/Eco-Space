@@ -11,56 +11,64 @@ import org.ecospace.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+
 import java.util.UUID;
 
 @Service
 public class CardServiceImpl {
 
-    private final UserRepository userRepository;
+
     private final CardRepository cardRepository;
     private final SubscriptionServiceImpl subscriptionService;
+    private final UserServiceImpl userService;
+    private final UserRepository userRepository;
 
-    public CardServiceImpl(UserRepository userRepository, CardRepository cardRepository, SubscriptionServiceImpl subscriptionService) {
-        this.userRepository = userRepository;
+
+    public CardServiceImpl(CardRepository cardRepository, SubscriptionServiceImpl subscriptionService, UserServiceImpl userService, UserRepository userRepository) {
+
         this.cardRepository = cardRepository;
         this.subscriptionService = subscriptionService;
 
+
+        this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     @Transactional
     public void create(HttpSession httpSession, UserCardDto cardDto, UUID id) {
-        if (httpSession == null) {
+        if (httpSession.getAttribute("userId") == null) {
             throw new RuntimeException("You need to have account!");
         }
 
         UUID userId = (UUID) httpSession.getAttribute("userId");
-        Optional<User> byId = userRepository.findById(userId);
+        User byId =userService.byId(userId);
 
-        if (byId.isEmpty()) {
-            throw new RuntimeException("User not exist");
-        }
         Subscription subscription = subscriptionService.byId(id);
-        List<Subscription> subscribtionsByUser = subscriptionService.getAllSubscriptionByUserId(byId.get().getId());
-        if(subscribtionsByUser == null){
-            subscribtionsByUser=new ArrayList<>();
-        }
-        subscribtionsByUser.add(subscription);
+
+        subscription.setCreatedOn(LocalDateTime.now());
+        LocalDateTime expire=userService.createSubscriptionPeriod(subscription);
+        subscription.setExpiresOn(expire);
+
+        List<Subscription> userSubscriptions = new ArrayList<>(userService.getClentSubs(userId));
+        userSubscriptions.add(subscription);
+        byId.setSubscriptions(userSubscriptions);
+
         UserCard card = new UserCard();
         card.setCard(cardDto.getCard());
         card.setName(cardDto.getName());
         card.setExpiresOn(YearMonth.parse(cardDto.getExpiresOn(), DateTimeFormatter.ofPattern("MM/yy")));
         card.setCvv(cardDto.getCvv());
-
         this.cardRepository.save(card);
-        byId.get().setUserCard(card);
-        byId.get().setSubscriptions(subscribtionsByUser);
+        byId.setUserCard(card);
 
-        this.userRepository.save(byId.get());
+
+        this.userRepository.save(byId);
+
 
     }
 }
