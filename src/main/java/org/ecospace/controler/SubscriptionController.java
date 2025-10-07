@@ -50,13 +50,6 @@ public class SubscriptionController {
     }
 
 
-    @PostMapping("/design")
-
-    public String designPackiges(DesignSubscriptionDto designDto) {
-
-        return "/design";
-
-    }
 
 
     @GetMapping("/add-subscription")
