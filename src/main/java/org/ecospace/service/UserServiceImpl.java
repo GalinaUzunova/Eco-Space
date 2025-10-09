@@ -3,10 +3,10 @@ package org.ecospace.service;
 import jakarta.servlet.http.HttpSession;
 import org.ecospace.model.Subscription;
 import org.ecospace.model.User;
-import org.ecospace.model.UserCard;
 import org.ecospace.model.UserRole;
 import org.ecospace.model.dto.LoginDto;
 import org.ecospace.model.dto.SubscriptionDtos;
+import org.ecospace.model.dto.UserCardDto;
 import org.ecospace.model.dto.UserDto;
 import org.ecospace.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,11 +30,13 @@ public class UserServiceImpl {
         private final SubscriptionServiceImpl subscriptionService;
 
 
+
         @Autowired
         public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, SubscriptionServiceImpl subscriptionService) {
             this.userRepository = userRepository;
 
             this.passwordEncoder = passwordEncoder;
+
             this.subscriptionService = subscriptionService;
         }
 
@@ -103,10 +106,7 @@ public class UserServiceImpl {
             }
             //chek if is not expired-comapre dates;
             //check if its enough funds;
-            UserCard userCard=user.get().getUserCard();
-            if(userCard== null){
-                return false;
-            }
+
 
             Subscription subscription= this.userRepository.findUserSubs(userId)
                     .stream().filter(s->s.getId().equals(subscriptionDtos.getId())).findFirst().orElse(null);
@@ -121,6 +121,33 @@ public class UserServiceImpl {
             return true;
 
         }
+
+    public void buySubscription(HttpSession httpSession, UserCardDto cardDto, UUID id) {
+        if (httpSession.getAttribute("userId") == null) {
+            throw new RuntimeException("You need to have account!");
+        }
+
+        UUID userId = (UUID) httpSession.getAttribute("userId");
+       Optional<User>byId =userRepository.findById(userId);
+       if(byId.isEmpty()){
+           throw new RuntimeException("User dost exist!");
+       }
+        //chek if is not expired-comapre dates;
+        //check if its enough funds;
+      User user=byId.get();
+        Subscription subscription = subscriptionService.byId(id);
+
+        subscription.setCreatedOn(LocalDateTime.now());
+        LocalDateTime expire=createSubscriptionPeriod(subscription);
+        subscription.setExpiresOn(expire);
+
+        List<Subscription> userSubscriptions = new ArrayList<>(userRepository.findUserSubs(userId));
+        userSubscriptions.add(subscription);
+        user.setSubscriptions(userSubscriptions);
+        this.userRepository.save(user);
+
+
+    }
 
    public LocalDateTime createSubscriptionPeriod( Subscription subscription) {
 

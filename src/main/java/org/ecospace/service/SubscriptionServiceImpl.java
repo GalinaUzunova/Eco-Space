@@ -63,21 +63,6 @@ public class SubscriptionServiceImpl {
 
 
 
-//    public List<String> getSubscriptionName() {
-//        List<Subscription> activeSubscriptions = subscriptionRepository.findAll();
-//        List<String> subscriptionNames = new ArrayList<>();
-//        if (!activeSubscriptions.isEmpty()) {
-//            activeSubscriptions.forEach(s -> {
-//                String name = s.getNamePackage();
-//                subscriptionNames.add(name);
-//            });
-//            return subscriptionNames;
-//        }
-//        return new ArrayList<>();
-//
-
-//    }
-
     @Transactional
     public void editSubscription(UUID id, EditSubDto edited) {
 

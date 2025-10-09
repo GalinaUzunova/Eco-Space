@@ -17,4 +17,11 @@ public class HomeController {
     public String viewContact(){
         return "contact";
     }
+
+    @GetMapping("/subscriptions")
+
+    public String viewSubs(){
+
+        return "subscriptions";
+    }
 }

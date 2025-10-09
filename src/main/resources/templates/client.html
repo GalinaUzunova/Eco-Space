@@ -5,7 +5,7 @@
 </head>
 <body>
 <div id="main-container">
-    <header id="main-header" th:replace="~{fragments/commons::nav}">
+    <header id="main-header" th:replace="~{fragments/commons2::nav}">
         <h1 id="main-title">Client Portal</h1>
         <h2 id="page-title">Profile & Subscriptions</h2>
     </header>
@@ -23,7 +23,7 @@
             </div>
 
 
-            <form class="subscription-section"  th:method="POST" th:action="@{/client/renew}"
+            <form class="subscription-section"  th:method="POST" th:action="@{/client}"
                   th:object="${subscriptionDto}">
                 <h3 class="section-title">My Subscriptions</h3>
                 <p class="section-text">Manage your current subscriptions and add new ones.</p>
@@ -37,20 +37,24 @@
                         <option value="">-- Select a subscription --</option>
                         <option th:each="sub : ${clientSubs}"
                                 th:value="${sub.id}"
-                                th:text="|${sub.namePackage} -
+                              th:text="|${sub.namePackage} -
                                       Price: ${sub.price} -
                                       Expires On: ${#temporals.format(sub.expiresOn, 'dd/MM/yyyy')}|">
                         </option>
+
                     </select>
                     <span class="invalid-feedback text-danger" style="font-size: 10px"
                           th:if="${#fields.hasErrors('id')}"
                           th:errorclass="error"
                           th:errors="*{id}"></span>
+                    <div class="subscription-actions">
+                        <button type="submit" id="renew-button" class="action-button renew-button">
+                            Renew Subscription
+                        </button>
+<!--                        <a id="renew-button" class="action-button renew-button" th:href="@{/payment/{id}(id=*{id})}">Renew-->
+<!--                            Subscription</a>-->
+                    </div>
 
-                <div class="subscription-actions">
-                    <a id="renew-button" class="action-button renew-button" th:href="@{/client/renew}">Renew
-                        Subscription</a>
-                </div>
                 </div>
             </form>
 

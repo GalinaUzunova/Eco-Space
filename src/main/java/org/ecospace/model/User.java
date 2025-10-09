@@ -43,13 +43,10 @@ public class User  extends BaseEntity {
 
     private LocalDateTime created;
 
-    @OneToMany
-    private List<Project> clientProjects;
 
     @OneToMany (fetch =FetchType.EAGER)
     private List<Subscription>subscriptions;
-    @OneToOne
-    private UserCard userCard;
+
 }
 
 

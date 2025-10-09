@@ -9,7 +9,6 @@ import org.ecospace.model.dto.LoginDto;
 import org.ecospace.model.dto.SubscriptionDtos;
 import org.ecospace.model.dto.UserCardDto;
 import org.ecospace.model.dto.UserDto;
-import org.ecospace.service.CardServiceImpl;
 import org.ecospace.service.SubscriptionServiceImpl;
 import org.ecospace.service.UserServiceImpl;
 import org.springframework.stereotype.Controller;
@@ -32,17 +31,14 @@ public class UserController {
 
     private final UserServiceImpl userService;
     private final SubscriptionServiceImpl subscriptionService;
-    private final CardServiceImpl cardService;
+
 
     @ModelAttribute("subscriptionDto")
     private SubscriptionDtos get() {
         return new SubscriptionDtos();
     }
 
-//    @ModelAttribute("subsPackage")
-//    private List<String> getNamePackige() {
-//        return subscriptionService.getSubscriptionName();
-//    }
+
 
     @ModelAttribute("userDto")
     private UserDto create() {
@@ -60,10 +56,10 @@ public class UserController {
     }
 
 
-    public UserController(UserServiceImpl userService, SubscriptionServiceImpl subscriptionService, CardServiceImpl cardService) {
+    public UserController(UserServiceImpl userService, SubscriptionServiceImpl subscriptionService) {
         this.userService = userService;
         this.subscriptionService = subscriptionService;
-        this.cardService = cardService;
+
     }
 
     @GetMapping("/register")
@@ -141,11 +137,25 @@ public class UserController {
         List<Subscription> clientSubs = this.userService.getClentSubs(id);
         model.addAttribute("clientSubs", clientSubs);
         model.addAttribute("user", user);
-        clientSubs.forEach(System.out::println
-        );
 
+        if (!model.containsAttribute("subscriptionDto")) {
+            model.addAttribute("subscriptionDto", new SubscriptionDtos());
+        }
 
         return "client";
+    }
+
+    @PostMapping("/client")
+
+    public String getClient(@Valid SubscriptionDtos subscriptionDto,BindingResult bindingResult
+    ,RedirectAttributes redirectAttributes){
+        if(bindingResult.hasErrors()){
+            redirectAttributes.addFlashAttribute("subscriptionDto", subscriptionDto);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.subscriptionDto",bindingResult);
+            return "redirect:/client/";
+        }
+        return "redirect:/payment/"+ subscriptionDto.getId();
+
     }
 
     @GetMapping("/logout")
@@ -168,21 +178,6 @@ public class UserController {
         return "payment";
     }
 
-    @PostMapping("/client/renew/")
-
-    private String getPage(HttpSession httpSession, @Valid SubscriptionDtos subscriptionDto, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
-
-        if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("subscriptionDto", subscriptionDto);
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.subscriptionDto", bindingResult);
-
-            return "client";
-
-        }
-      this.userService.renew(httpSession,subscriptionDto);
-
-        return "successes";
-    }
 
 
     @PostMapping("/payment/{id}")
@@ -195,7 +190,7 @@ public class UserController {
             return "redirect:/payment/" + id;
         }
 
-        this.cardService.create(httpSession, cardDto, id);
+        this.userService.buySubscription(httpSession, cardDto, id);
         return "redirect:/client";
     }
 }
