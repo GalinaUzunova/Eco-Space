@@ -1,7 +1,7 @@
 package org.ecospace.repository;
 
 import org.ecospace.model.Product;
-import org.ecospace.model.Subscription;
+
 import org.ecospace.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

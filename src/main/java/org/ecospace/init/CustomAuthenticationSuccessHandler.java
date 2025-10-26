@@ -16,7 +16,7 @@ public class CustomAuthenticationSuccessHandler implements org.springframework.s
 
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException{
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         String redirectUrl = determineTargetUrl(authorities);

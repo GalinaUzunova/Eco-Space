@@ -1,6 +1,6 @@
 package org.ecospace.service;
 
-import jakarta.servlet.http.HttpSession;
+
 import org.ecospace.model.Product;
 import org.ecospace.model.Subscription;
 import org.ecospace.model.User;

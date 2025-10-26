@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 
 import jakarta.validation.constraints.Email;
 import lombok.*;
-import org.hibernate.validator.constraints.URL;
-
 
 import java.time.LocalDateTime;
 import java.util.List;
