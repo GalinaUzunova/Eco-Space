@@ -5,10 +5,12 @@
 </head>
 <body>
 <div id="main-container">
-    <header id="main-header" th:replace="~{fragments/commons::nav}">
-        <h1 id="main-title">Client Portal</h1>
+    <header id="main-header">
+        <h1 id="main-title">Manager Portal</h1>
         <h2 id="page-title">Add New Subscription Plan</h2>
+        <nav id="nav-container"  th:replace="~{fragments/admin::nav}">
 
+        </nav>
 
     </header>
 
@@ -93,21 +95,7 @@
 
                             </td>
                         </tr>
-                        <tr>
-                            <td class="form-label">Duration:</td>
-                            <td>
-                                <input  type="number" id="subscriptionPeriod"
-                                        class="form-input"
-                                        th:field="*{subscriptionPeriod}" required
 
-
-
-                                >
-
-
-
-                            </td>
-                        </tr>
                     </table>
 
                     <div class="description-section">

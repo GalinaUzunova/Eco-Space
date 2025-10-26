@@ -6,31 +6,41 @@
 </head>
 <body>
 <div id="main-container">
-    <header id="main-header" th:replace="~{fragments/commons::nav}">
+    <header id="main-header" >
         <h1 id="main-title">EcoSpace Login</h1>
+        <nav id="nav-container">
+
+
+
+
+
+
+        </nav>
 
     </header>
 
     <div class="content-section">
         <h2 class="section-title">Login to Your Account</h2>
 
-        <form class="form-container" th:method="POST" th:action="@{/login}" th:object="${loginDto}">
+        <form class="form-container"  th:method="POST" th:action="@{login}"  >
             <table class="form-table">
                 <tr>
                     <td class="form-label">Username:</td>
-                    <td><input type="text" class="form-input" th:field="*{username}" required>
-                        <div th:each="error: ${#fields.errors()}" th:text="${error}" class="bg-danger text-light rounded"></div>
+                    <td ><input type="text" class="form-input" name="username" id="username"  required>
+
 
                     </td>
 
                 </tr>
                 <tr>
                     <td class="form-label">Password:</td>
-                    <td><input type="password" class="form-input" th:field="*{password}" required>
-                        <div th:each="error: ${#fields.errors()}" th:text="${error}" class="bg-danger text-light rounded"></div>
+                    <td><input type="password"  class="form-input" name="password" id="password"
+                               required>
+
 
                     </td>
                 </tr>
+                <p th:if="${errorMessage}" th:text="${errorMessage}" class="alert-warning"></p>
                 <tr>
                     <td colspan="2">
                         <input type="submit" class="form-submit" value="Login">

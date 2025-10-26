@@ -6,6 +6,7 @@ import org.ecospace.model.Subscription;
 import org.ecospace.model.SubscriptionType;
 import org.ecospace.model.dto.*;
 import org.ecospace.service.SubscriptionServiceImpl;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -45,21 +46,20 @@ public class SubscriptionController {
 
       List<DesignSubscriptionDto>byDesign=  subscriptionService.getDesignSubscriptions();
       model.addAttribute("byDesign", byDesign);
+      model.addAttribute("currentPage", "design");
 
         return "design";
     }
 
 
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/add-subscription")
-
     public String viewpage() {
         return "add-subscription";
     }
 
-
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/add-subscription")
 
     public String createSub(@Valid AddSubDto subDto, BindingResult bindingResult, RedirectAttributes
@@ -84,6 +84,7 @@ public class SubscriptionController {
     public String viewMaintenance(Model model) {
      List<MaintenanceSubDto> maintenanceSubscriptions= subscriptionService.getMaintenanceSubscriptions();
       model.addAttribute("maintenanceSubscriptions",maintenanceSubscriptions);
+      model.addAttribute("currentPage","maintenance");
 
         return "maintenance";
     }
@@ -92,6 +93,7 @@ public class SubscriptionController {
 
 
     @GetMapping("/edit-subscription/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
             public String viewEditForm(@PathVariable("id") UUID id,Model model) {
 
 
@@ -105,6 +107,7 @@ public class SubscriptionController {
     }
 
     @PutMapping ("/edit-subscription/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
 
     public String viewEditSub(@PathVariable("id") UUID id,@Valid EditSubDto editedDto,BindingResult bindingResult,
                               RedirectAttributes redirectAttributes){
@@ -125,6 +128,7 @@ public class SubscriptionController {
     }
 
     @GetMapping("edit-subscription/remove/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
 
     public String removePackage(@PathVariable("id") UUID id ){
          Subscription subscription=subscriptionService.byId(id);

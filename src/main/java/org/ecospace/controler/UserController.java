@@ -1,24 +1,24 @@
 package org.ecospace.controler;
 
-import jakarta.servlet.http.HttpSession;
+
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.ecospace.model.Product;
 import org.ecospace.model.Subscription;
 import org.ecospace.model.User;
-import org.ecospace.model.dto.LoginDto;
 import org.ecospace.model.dto.SubscriptionDtos;
 import org.ecospace.model.dto.UserCardDto;
 import org.ecospace.model.dto.UserDto;
+import org.ecospace.security.AuthenticationMetadata;
+import org.ecospace.service.ProductServiceImpl;
 import org.ecospace.service.SubscriptionServiceImpl;
 import org.ecospace.service.UserServiceImpl;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
 
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
@@ -32,22 +32,17 @@ public class UserController {
     private final UserServiceImpl userService;
     private final SubscriptionServiceImpl subscriptionService;
 
+    private final ProductServiceImpl productService;
+
 
     @ModelAttribute("subscriptionDto")
     private SubscriptionDtos get() {
         return new SubscriptionDtos();
     }
 
-
-
     @ModelAttribute("userDto")
     private UserDto create() {
         return new UserDto();
-    }
-
-    @ModelAttribute("loginDto")
-    private LoginDto createLogin() {
-        return new LoginDto();
     }
 
     @ModelAttribute("cardDto")
@@ -56,10 +51,10 @@ public class UserController {
     }
 
 
-    public UserController(UserServiceImpl userService, SubscriptionServiceImpl subscriptionService) {
+    public UserController(UserServiceImpl userService, SubscriptionServiceImpl subscriptionService, ProductServiceImpl productService) {
         this.userService = userService;
         this.subscriptionService = subscriptionService;
-
+        this.productService = productService;
     }
 
     @GetMapping("/register")
@@ -74,13 +69,11 @@ public class UserController {
     public String doRegister(@Valid UserDto userDto, BindingResult bindingResult, RedirectAttributes redirectAttributes
     ) {
 
-
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("userDto", userDto);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.userDto", bindingResult);
 
             return "redirect:/register";
-
 
         } else if (!userDto.getPassword().equals(userDto.getConfirmPassword())) {
             bindingResult.rejectValue("confirmPassword", "Error", "Password don't match");
@@ -100,43 +93,30 @@ public class UserController {
 
     }
 
-    @PostMapping("/login")
-
-    public String doLogin(@Valid LoginDto loginDto, BindingResult bindingResult, RedirectAttributes redirectAttributes, HttpSession httpSession) {
-
-        if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("loginDto", loginDto);
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.loginDto", bindingResult);
-
-            return "redirect:/login";
-        }
-
-        User user = userService.login(loginDto);
-        httpSession.setAttribute("userId", user.getId());
-
-        return "redirect:/client";
-
-
-    }
 
     @GetMapping("/login")
 
-    public String viewLogin() {
+    public String viewLogin(@RequestParam(value = "error",required = false)String errorParam, Model model) {
+      if(errorParam != null){
+          model.addAttribute("errorMessage","Username or password is incorrect!");
 
+      }
         return "login";
     }
 
 
     @GetMapping("/client")
 
-    public String viewClient(Model model, HttpSession session) {
+    public String viewClient(@AuthenticationPrincipal AuthenticationMetadata authenticationPriciple , Model model){
 
-        UUID id = (UUID) session.getAttribute("userId");
-        User user = userService.byId(id);
+        User user= userService.byId( authenticationPriciple.getId());
 
-        List<Subscription> clientSubs = this.userService.getClentSubs(id);
+        List<Product> clientSubs = this.userService.getClentSubs(authenticationPriciple.getId());
         model.addAttribute("clientSubs", clientSubs);
         model.addAttribute("user", user);
+        model.addAttribute("currentPage","client");
+
+
 
         if (!model.containsAttribute("subscriptionDto")) {
             model.addAttribute("subscriptionDto", new SubscriptionDtos());
@@ -154,23 +134,16 @@ public class UserController {
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.subscriptionDto",bindingResult);
             return "redirect:/client/";
         }
-        return "redirect:/payment/"+ subscriptionDto.getId();
+        UUID id=subscriptionDto.getId();
+        return "redirect:/renew/"+ id;
 
     }
 
-    @GetMapping("/logout")
 
-    public String logout(HttpSession session) {
-
-        session.invalidate();
-
-        return "redirect:/";
-
-    }
 
     @GetMapping("/payment/{id}")
 
-    private String getPayment(@PathVariable("id") UUID id, Model model) {
+    public String getPayment(@PathVariable("id") UUID id, Model model) {
 
         Subscription subscriptionUser = subscriptionService.byId(id);
         model.addAttribute("subscriptionUser", subscriptionUser);
@@ -182,7 +155,7 @@ public class UserController {
 
     @PostMapping("/payment/{id}")
 
-    private String doPayment(@PathVariable("id") UUID id, @Valid UserCardDto cardDto, BindingResult bindingResult, RedirectAttributes redirectAttributes, HttpSession httpSession) {
+   public String doPayment(@PathVariable("id") UUID id, @Valid UserCardDto cardDto, BindingResult bindingResult, RedirectAttributes redirectAttributes, @AuthenticationPrincipal AuthenticationMetadata authenticationPriciple) {
 
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("cardDto", cardDto);
@@ -190,9 +163,37 @@ public class UserController {
             return "redirect:/payment/" + id;
         }
 
-        this.userService.buySubscription(httpSession, cardDto, id);
-        return "redirect:/client";
+        this.userService.buyProduct(authenticationPriciple, cardDto, id);
+        return "successes";
     }
+
+    @PostMapping("/renew/{id}")
+
+    private String renewProduct(@PathVariable("id") UUID id, @Valid UserCardDto cardDto, BindingResult bindingResult, RedirectAttributes redirectAttributes, @AuthenticationPrincipal AuthenticationMetadata authenticationPriciple) {
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("cardDto", cardDto);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.cardDto", bindingResult);
+            return "redirect:/renew/" + id;
+        }
+
+        this.userService.renew(authenticationPriciple, cardDto, id);
+        return "successes";
+
+    }
+
+    @GetMapping("/renew/{id}")
+
+    private String getRenewPage(@PathVariable UUID id,Model model){
+
+        Product product=productService.findById(id);
+        model.addAttribute("product",product);
+
+
+
+        return "renew";
+
+    }
+
 }
 
 

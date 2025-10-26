@@ -1,8 +1,8 @@
 package org.ecospace.repository;
 
+import org.ecospace.model.Product;
 import org.ecospace.model.Subscription;
 import org.ecospace.model.User;
-import org.ecospace.model.dto.LoginDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,10 +19,13 @@ public interface UserRepository  extends JpaRepository<User, UUID> {
     Optional<User> findByUsername(String username);
 
     Optional<User>findByUsernameAndEmail(String username,String email);
-    @Query ("select  s.subscriptions  from User as s where s.id= :id")
-    List<Subscription>findUserSubs(@Param("id") UUID id);
+    @Query ("select p.productList  from User as p where p.id= :id")
+    List<Product>findUserSubs(@Param("id") UUID id);
 
 
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.productList p ORDER BY u.username")
+    List<User>findAllByAndProductList();
 
+    List<User>getAllBy();
 
 }

@@ -5,49 +5,32 @@
 </head>
 <body>
 <div id="main-container">
-    <header id="main-header" th:replace="~{fragments/commons::nav}">
+    <header id="main-header">
         <h1 id="main-title">EcoSpace Registration</h1>
+        <nav id="nav-container">
+
+            <a th:href="@{home}" class="nav-button">Home</a>
+
+            <a th:href="@{login}" class="nav-button">Login</a>
+
+
+        </nav>
 
     </header>
 
     <div class="content-section">
         <h2 class="section-title">Create Your Account</h2>
 
-        <form class="form-container"  th:method="POST" th:action="@{/register}"
-        th:object="${userDto}">
+        <form class="form-container" th:method="POST" th:action="@{/register}"
+              th:object="${userDto}">
             <table class="form-table">
 
-<!--                <tr>-->
-<!--                    <td class="form-label">Subscription Plan:</td>-->
-<!--                    <td>-->
-<!--                        <select class="form-input" th:field="*{packageName}"id="packages"-->
-<!--                                th:errorclass="'is-invalid alert-danger'" required>-->
-<!--                            <option value="">&#45;&#45; Choose a Plan &#45;&#45;</option>-->
-<!--                            <option th:each="plan : ${subsPackage}"-->
-<!--                                    th:value="${plan}"-->
-<!--                                    th:text="${plan}">-->
-
-<!--                            </option>-->
-<!--                        </select>-->
-
-
-
-<!--                        <span class="invalid-feedback  bg-danger text-light rounded text-danger" style="font-size: 10px"-->
-<!--                              th:if="${#fields.hasErrors('packageName')}"-->
-<!--                              th:errorclass="error"-->
-<!--                              th:errors="*{packageName}">-->
-
-<!--                        </span>-->
-
-
-
-<!--                </tr>-->
                 <tr>
                     <td class="form-label">Username:</td>
                     <td><input type="text" class="form-input"
                                th:field="*{username}"
                                id="username"
-                               th:errorclass="'is-invalid alert-danger'" >
+                               th:errorclass="'is-invalid alert-danger'">
 
                         <span class="invalid-feedback  bg-danger text-light rounded text-danger" style="font-size: 10px"
                               th:if="${#fields.hasErrors('username')}"
@@ -56,44 +39,54 @@
 
                         </span>
 
-                        </td>
+                    </td>
                 </tr>
                 <tr>
                     <td class="form-label">Email:</td>
 
-                    <td><input type="email" class="form-input"  id="email"
+                    <td><input type="email" class="form-input" id="email"
                                th:field="*{email}"
-                               th:errorclass="'is-invalid alert-danger'" >
+                               th:errorclass="'is-invalid alert-danger'">
 
                         <span class="invalid-feedback  bg-danger text-light rounded text-danger" style="font-size: 10px"
                               th:if="${#fields.hasErrors('email')}"
                               th:errorclass="error"
-                              th:errors="*{email}" ></span>
+                              th:errors="*{email}"></span>
                     </td>
                 </tr>
-                <tr>
+
+
+<!--                <tr>-->
+<!--                    <td class="form-label">Picture:</td>-->
+<!--                    <td><input type="text" class="form-input" id="image" th:field="*{image}"-->
+
+<!--                    >-->
+<!--                    </td>-->
+
+
+<!--                </tr>-->
+<!--                <tr>-->
                     <td class="form-label">Password:</td>
                     <td><input type="password" class="form-input" id="password"
                                th:field="*{password}"
-                               th:errorclass="'is-invalid alert-danger'" >
+                               th:errorclass="'is-invalid alert-danger'">
 
                         <span class="invalid-feedback text-danger" style="font-size: 10px"
                               th:if="${#fields.hasErrors('password')}"
                               th:errorclass="error"
-                              th:errors="*{password}" ></span>
+                              th:errors="*{password}"></span>
                     </td>
                 </tr>
                 <tr>
                     <td class="form-label">Confirm Password:</td>
-                    <td><input type="password" class="form-input"  id= "confirm-password"
+                    <td><input type="password" class="form-input" id="confirm-password"
                                th:field="*{confirmPassword}">
-
 
 
                         <span class="invalid-feedback text-danger" style="font-size: 10px"
                               th:if="${#fields.hasErrors('confirmPassword')}"
                               th:errorclass="error"
-                              th:errors="*{confirmPassword}" ></span>
+                              th:errors="*{confirmPassword}"></span>
 
 
                     </td>

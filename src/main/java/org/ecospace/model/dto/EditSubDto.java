@@ -25,8 +25,6 @@ public class EditSubDto {
     @NotNull(message = " Filed can't be empty")
     @Positive(message = "Price must be a positive number!")
     private double price;
-    @NotBlank(message = "Subscription period is required!")
-    private String subscriptionPeriod;
     @NotBlank(message = "Field can't be empty!")
     private String description;
 }

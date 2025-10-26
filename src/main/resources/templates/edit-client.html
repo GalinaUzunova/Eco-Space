@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="~{fragments/commons::head}">
+    <title>Client Management</title>
+    <link rel="stylesheet" th:href="@{/css/manager.css}">
+</head>
+<body>
+<div id="main-container">
+    <header id="main-header">
+        <h1 id="main-title">Client Management</h1>
+        <nav id="nav-container" th:replace="~{fragments/admin::nav}">
+
+
+        </nav>
+
+    </header>
+
+    <div class="content-section">
+
+        <h2 class="section-title">All Clients</h2>
+
+
+<!--         Search and Filter Section-->
+<!--                <div class="subscription-actions" style="margin-bottom: 20px;">-->
+<!--                    <input type="text" class="form-input" placeholder="Search clients..." style="flex: 2;">-->
+<!--                    <select class="form-input" style="flex: 1;">-->
+<!--                        <option value="">All Status</option>-->
+<!--                        <option value="ACTIVE">Active</option>-->
+<!--                        <option value="INACTIVE">Inactive</option>-->
+<!--                        <option value="PENDING">Pending</option>-->
+<!--                    </select>-->
+<!--                    <button class="action-button renew-button">Search</button>-->
+<!--                </div>-->
+
+        <!-- Clients Table -->
+        <div class="project-category">
+            <table class="project-table">
+                <thead>
+                <tr>
+                    <th>Client Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Registration Date</th>
+                    <th>Change Role</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="client : ${clients}">
+                    <td th:text="${client.username}">John Doe</td>
+                    <td th:text="${client.email}">john@example.com</td>
+                    <td>
+                            <span
+                                    th:text="${client.role}">Active</span>
+                    </td>
+                    <td th:text="${#temporals.format(client.createdOn, 'dd/MM/yyyy')}">01/01/2024</td>
+                    <td>
+                        <button class="status-button">Switch Role</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <div class="packages-container" style="margin-top: 30px;">
+            <div class="package package-basic">
+                <div class="package-header">Total Clients</div>
+                <div class="package-price" th:text="${clients.size()!= null ? clients.size(): clients.size()}"></div>
+                <div class="package-features">
+                    <ul>
+<!--                        <li>Active: <span th:text="${activeClients != null ? activeClients : '120'}">120</span></li>-->
+<!--                        <li>Inactive: <span th:text="${inactiveClients != null ? inactiveClients : '20'}">20</span></li>-->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer id="main-footer">
+        <p>© 2025 EcoSpace. All rights reserved.</p>
+    </footer>
+</div>
+</body>
+</html>

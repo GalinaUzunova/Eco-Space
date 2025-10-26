@@ -660,8 +660,18 @@ body {
     backdrop-filter: blur(3px);
 }
 
+
 /* Responsive Design */
 @media (max-width: 768px) {
+    #side-menu {
+        width: 200px;
+    }
+
+    #main-container {
+        margin-left: 200px;
+        max-width: calc(100% - 200px);
+    }
+
     #main-title {
         font-size: 2rem;
     }
@@ -705,12 +715,56 @@ body {
         width: 100%;
         max-width: 350px;
     }
-
-
-
-
-
 }
+
+@media (max-width: 600px) {
+    #side-menu {
+        width: 100%;
+        height: auto;
+        position: relative;
+        border-right: none;
+        border-bottom: 2px solid #8BC34A;
+    }
+
+    #main-container {
+        margin-left: 0;
+        max-width: 100%;
+    }
+
+    body {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-name {
+        font-size: 1.5rem;
+    }
+
+    .section-title {
+        font-size: 1.4rem;
+    }
+
+    .action-button {
+        padding: 10px 15px;
+        font-size: 0.9rem;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .form-submit, .cancel-button {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .add-button {
+        width: 30%;
+    }
+}
+
 
 @media (max-width: 480px) {
     .profile-name {

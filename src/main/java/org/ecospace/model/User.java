@@ -2,7 +2,9 @@ package org.ecospace.model;
 
 import jakarta.persistence.*;
 
+import jakarta.validation.constraints.Email;
 import lombok.*;
+import org.hibernate.validator.constraints.URL;
 
 
 import java.time.LocalDateTime;
@@ -22,7 +24,7 @@ import java.util.List;
 public class User  extends BaseEntity {
     @Column(nullable = false)
     private String username;
-
+    @Email
     @Column(nullable = false)
     String email;
 
@@ -32,20 +34,19 @@ public class User  extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
-
     private LocalDateTime createdOn;
+      @Column(columnDefinition = "Blob")
+    private String image;
 
-    private boolean renew;
 
     private boolean active;
-
-    private String packageName;
-
-    private LocalDateTime created;
+    private boolean isNotified;
 
 
-    @OneToMany (fetch =FetchType.EAGER)
+    @OneToMany
     private List<Subscription>subscriptions;
+    @OneToMany(fetch = FetchType.EAGER)
+    private List<Product>productList;
 
 }
 

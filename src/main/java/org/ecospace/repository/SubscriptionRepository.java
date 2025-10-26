@@ -15,7 +15,10 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, UUID
 
  Optional<Subscription>findById(UUID id);
  List<Subscription>getByType(SubscriptionType type);
- List<Subscription>findAll();
+// List<Subscription>findAll();
+
+
+
 
 
 

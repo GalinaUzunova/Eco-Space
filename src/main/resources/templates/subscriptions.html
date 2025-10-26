@@ -1,69 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
-<head th:replace="~{fragments/commons::head}">
-
-
+<head th:replace="~{fragments/admin::head}">
 </head>
 <body>
 <div id="main-container">
-    <header id="main-header" th:replace="~{fragments/commons::nav}">
-        <h1 id="main-title">EcoSpace Projects</h1>
+    <header id="main-header" th:replace="~{fragments/admin::nav}">
 
     </header>
 
     <div class="content-section">
-        <h2 class="section-title">Project Management</h2>
+        <h2 class="section-title">Subscription Management</h2>
 
         <div class="project-section">
-            <h3 class="section-title">Requested Projects</h3>
+            <h3 class="section-title">Requested Subscriptions</h3>
             <div class="project-category">
                 <table class="project-table">
+                    <thead>
                     <tr>
-                        <th>Project Name</th>
+                        <th>Subscription Name</th>
                         <th>Client</th>
-                        <th>Request Date</th>
-                        <th>Type</th>
+                        <th>Start Date</th>
+                        <th>Expire Date</th>
+<!--                        <th>Edit</th>-->
                     </tr>
-                    <tr>
-<!--                        <td>Office Green Wall Installation</td>-->
-<!--                        <td>TechCorp Ltd</td>-->
-<!--                        <td>2023-10-15</td>-->
-
+                    </thead>
+                    <tbody th:each="user : ${allUsers}">
+                    <tr th:each="p : ${user.productList}">
+                        <td th:text="${p.namePackage}">Subscription Name</td>
+                        <td th:text="${user.username}">Client</td>
+                        <td th:text="${p.createdOn}">Start Date</td>
+                        <td th:text="${p.expired}">Expire Date</td>
+<!--                        <td>-->
+<!--                            <button class="status-button">Switch Role</button>-->
+<!--                     </td>-->
                     </tr>
+                    </tbody>
                 </table>
-            </div >
+            </div>
             <div class="request">
 
-            </div>
-           <button class="status-button">Approve</button>
-            <button class="status-button">Delete</button>
-        </div>
-
-        <div class="project-section">
-            <h3 class="section-title">Projects in Progress</h3>
-            <div class="project-category">
-                <table class="project-table">
-                    <tr>
-                        <th>Project Name</th>
-                        <th>Start Date</th>
-                        <th>Deadline</th>
-                        <th>Progress</th>
-                        <th>Type</th>
-                    </tr>
-                 <tr >
-                        <td><button class="status-button">Change Status</button></td>
-                 </tr>
-
-                </table>
-                <div class="inProgress">
-
-                </div>
             </div>
         </div>
     </div>
 
     <footer id="main-footer">
-        <p>© 2023 EcoSpace. All rights reserved.</p>
+        <p>© 2025 EcoSpace. All rights reserved.</p>
     </footer>
 </div>
 </body>

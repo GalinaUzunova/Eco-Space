@@ -22,7 +22,6 @@ public class AddSubDto {
     @NotNull(message = "Field cant be empty")
     @Positive(message = "Price must be a positive number!")
     private double price;
-
     @NotBlank
     private String description;
 }

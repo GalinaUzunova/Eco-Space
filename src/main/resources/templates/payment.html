@@ -7,9 +7,17 @@
 
 <body>
 <div id="main-container">
-    <header id="main-header" th:replace="~{fragments/commons::nav}">
+    <header id="main-header">
         <h1 id="main-title">EcoSpace</h1>
         <h2 id="page-title">Payment Information</h2>
+        <nav id="nav-container">
+
+            <a th:href="@{home}" class="nav-button">Home</a>
+            <a th:href="@{logout}" class="nav-button">Logout</a>
+
+
+
+        </nav>
     </header>
 
 
@@ -24,7 +32,9 @@
                 </div>
                 <div class="summary-item">
                     <span>Billing Cycle:</span>
-                    <span>Yearly</span>
+                    <span th:if="${subscriptionUser.namePackage.contains('Month')}" th:text="Monthly"></span>
+                    <span th:if="${subscriptionUser.namePackage.contains('Year')}" th:text="Yearly"></span>
+<!--                    <span th:unless="${subscriptionUser.namePackage.contains('Month')|| ${subscriptionUser.namePackage.contains('Year')}}" th:text="Once-Off"></span>-->
                 </div>
                 <div class="summary-item">
                     <span>Features:</span>

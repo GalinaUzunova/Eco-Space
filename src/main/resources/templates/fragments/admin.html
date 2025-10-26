@@ -1,9 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eco-Space</title>
+
 
 
     <link rel="stylesheet" th:href="@{/css/style.css}">
@@ -16,10 +19,16 @@
 
     <nav id="nav-container">
 
-        <a th:href="@{/maintenance}" class="nav-button">Maintenance</a>
-        <a th:href="@{design}" class="nav-button">Design</a>
-        <a th:href="@{logout}" class="nav-button">Logout</a>
+        <a sec:authorize="hasRole('ADMIN')"
+           th:href="@{/manager}" class="nav-button">Manager Dashboard</a>
 
+
+        <div sec:authorize="isAuthenticated()" class="user-welcome">
+                <span class="welcome-text">
+                    Welcome, <strong sec:authentication="name"></strong>
+
+                </span>
+        </div>
 
     </nav>
 </header>

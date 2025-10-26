@@ -1,15 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 <head th:replace="~{fragments/commons::head}">
 
 
 </head>
 <body>
 <div id="main-container">
-    <header id="main-header" th:replace="~{fragments/commons::nav}">
+    <header id="main-header" sec:authorize="hasRole('CLIENT')" th:replace="~{fragments/commons::nav}">
         <h1 id="main-title">EcoSpace Design Services</h1>
 
     </header>
+    <nav sec:authorize="hasRole('ADMIN')" th:replace="~{fragments/admin::nav}">
+    </nav>
 
     <div class="content-section" >
         <h2 class="section-title">Professional Landscape Design Packages</h2>
@@ -24,54 +28,25 @@
 
                     </ul>
                     <a class="buy-button"
-                            th:if="${session.userId != null}"
+                       sec:authorize="hasRole('CLIENT')"
                             th:href ="@{/payment/{id}(id=*{design.getId()})}">Buy Now</a>
 
-                    <a th:unless="${session.userId}"
+                    <a sec:authorize="!isAuthenticated()"
                        th:href="@{/register}"
                        class="buy-button">
                         Select Plan
                     </a>
 
 
-                    <p><a class="edit-button" th:href="@{edit-subscription/{id}(id=*{design.getId()})}">Edit</a></p>
-                    <a class="remove-button" th:href="@{/edit-subscription/remove/{id}(id=${design.id})}">Remove Package</a>
+                    <p><a  sec:authorize="hasRole('ADMIN')" class="edit-button" th:href="@{edit-subscription/{id}(id=*{design.getId()})}">Edit</a></p>
+                    <a  sec:authorize="hasRole('ADMIN')" class="remove-button" th:href="@{/edit-subscription/remove/{id}(id=${design.id})}">Remove Package</a>
                 </div>
             </div>
 
-            <div class="package package-2d-premium">
-                <div class="package-header">2D Premium Package</div>
-                <div class="package-price">R 4500</div>
-                <div class="package-features">
-                    <ul>
-                        <li>Comprehensive site analysis</li>
-                        <li>Detailed 2D master plan</li>
-                        <li>Planting schedule</li>
-                        <li>Material specifications</li>
-                        <li>3 revisions included</li>
-                        <li>PDF + printed copy</li>
-                    </ul>
-                    <p class="buy-button"><a th:href ="@{/register}">Select Plan</a></p>
-                    <button class="edit-button">Edit Package</button>
-                    <button class="remove-button">Remove Package</button>
-                </div>
+
             </div>
 
-            <div class="package package-3d">
-                <div class="package-header">3D Visualization Package</div>
-                <div class="package-price">R 8900</div>
-                <div class="package-features">
-                    <ul>
-                        <li>Everything in 2D Premium</li>
-                        <li>3D digital model</li>
-                        <li>Photorealistic renderings</li>
-                        <li>Virtual walkthrough</li>
-                        <li>Unlimited revisions</li>
-                        <li>All source files included</li>
-                    </ul>
-                    <p class="buy-button"><a th:href ="@{/register}">Select Plan</a></p>
-                </div>
-            </div>
+
         </div>
     </div>
 

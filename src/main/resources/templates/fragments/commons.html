@@ -1,9 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"
+ xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eco-Space</title>
+
 
 
     <link rel="stylesheet" th:href="@{/css/style.css}">
@@ -15,18 +18,29 @@
 <header>
 
         <nav id="nav-container">
-            <a th:href="@{home}" class="nav-button">Home</a>
-            <a th:href="@{register}" class="nav-button">Register</a>
-            <a th:href="@{login}" class="nav-button">Login</a>
-            <a th:href="@{contact}" class="nav-button">Contact Us</a>
-            <a th:href="@{/maintenance}" class="nav-button">Maintenance</a>
-            <a th:href="@{design}" class="nav-button">Design</a>
-            <a th:href="@{add-subscription}" class="nav-button">Add Subscription</a>
-            <a th:href="@{client}" class="nav-button">Client</a>
-            <a th:href="@{subscriptions}" class="nav-button">Subscriptions</a>
-<!--            <a th:href="@{add-project}" class="nav-button">Add Project</a>-->
-            <a th:href="@{logout}" class="nav-button">Logout</a>
 
+            <a  th:if="${currentPage != 'home'}" th:href="@{home}" class="nav-button">Home</a>
+            <a sec:authorize="!isAuthenticated()" th:href="@{register}" class="nav-button">Register</a>
+            <a sec:authorize="!isAuthenticated()" th:href="@{login}" class="nav-button">Login</a>
+            <a th:if="${currentPage != 'maintenance'}" th:href="@{/maintenance}" class="nav-button">Maintenance</a>
+            <a th:if="${currentPage != 'design'}" th:href="@{design}" class="nav-button">Design</a>
+            <a  th:if="${currentPage != 'contact'}" th:href="@{contact}" class="nav-button">Contact Us</a>
+            <a sec:authorize="hasRole('ADMIN')"
+               th:href="@{manager}" class="nav-button">Manager</a>
+
+            <a  th:if="${currentPage != 'client'}" sec:authorize="hasRole('CLIENT')"
+               th:href="@{client}" class="nav-button">Profile</a>
+
+            <a  sec:authorize="isAuthenticated()"
+                th:href="@{logout}" class="nav-button">Logout</a>
+
+
+            <div sec:authorize="isAuthenticated()" class="user-welcome">
+                <span class="welcome-text">
+                    Welcome, <strong sec:authentication="name"></strong>
+
+                </span>
+            </div>
 
         </nav>
 </header>

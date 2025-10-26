@@ -1,24 +1,28 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/html">
-<head th:replace="~{fragments/commons::head}">
+<html lang="en" xmlns="http://www.w3.org/1999/html"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+
+
+<head   th:replace="~{fragments/commons::head}">
 
 
 </head>
 <body>
 <div id="main-container">
-    <header id="main-header" th:replace="~{fragments/commons::nav}">
+    <header id="main-header"  sec:authorize="hasRole('CLIENT')" th:replace="~{fragments/commons::nav}">
         <h1 id="main-title">EcoSpace Maintenance Packages</h1>
 
 
+
     </header>
+    <nav sec:authorize="hasRole('ADMIN')" th:replace="~{fragments/admin::nav}">
+    </nav>
 
     <div class="content-section"
     >
         <h2 class="section-title">Maintenance Packages</h2>
-        <nav id="nav-container">
 
-
-        </nav>
 
         <div class="packages-container">
             <div class="package package-2d-basic" th:each="sub : ${maintenanceSubscriptions}">
@@ -29,17 +33,17 @@
 
                     </ul>
                     <p class="buy-button" >
-                        <a th:if="${session.userId != null}"
+                        <a sec:authorize="hasRole('CLIENT')"
                            th:href ="@{/payment/{id}(id=${sub.getId()})}">Buy Now</a>
 
-                        <a th:unless="${session.userId}"
+                        <a sec:authorize="!isAuthenticated()"
                            th:href="@{/register}"
                            class="btn btn-primary">
                             Select Plan
                         </a>
 
-                    <p><a class="edit-button" th:href="@{/edit-subscription/{id}(id=${sub.getId()})}">Edit</a></p>
-                    <p><a class="remove-button" th:href="@{/edit-subscription/remove/{id}(id=${sub.getId()})}">Remove Package</a></p>
+                    <p><a sec:authorize="hasRole('ADMIN')" class="edit-button" th:href="@{/edit-subscription/{id}(id=${sub.getId()})}">Edit</a></p>
+                    <p><a  sec:authorize="hasRole('ADMIN')" class="remove-button" th:href="@{/edit-subscription/remove/{id}(id=${sub.getId()})}">Remove Package</a></p>
 
                 </div>
             </div>
@@ -57,31 +61,13 @@
                         <li>Pest control management</li>
                         <li>Seasonal planting</li>
                     </ul>
-                    <p class="buy-button"><a th:href ="@{/register}">Select Plan</a></p>
+                    <p class="buy-button"><a th:href ="@{login}">Select Plan</a></p>
                     <button class="remove-button">Remove Package</button>
                     <p><a class="edit-button" th:href="@{edit-subscription}">Edit</a></p>
                 </div>
             </div>
 
-            <div class="package package-1y-premium">
-                <div class="package-header">1-Year Package</div>
-                <div class="package-price">R 10800</div>
-                <div class="package-features">
-                    <ul>
-                        <li>Everything in 6-Month Package</li>
-                        <li>Monthly comprehensive reports</li>
-                        <li>Priority scheduling</li>
-                        <li>Custom landscape design consultation</li>
-                        <li>Emergency service response</li>
-                        <li>Specialized plant healthcare</li>
-                        <li>4 seasonal clean-ups</li>
-                        <li>10% discount on additional services</li>
-                    </ul>
-                    <p class="buy-button"><a th:href ="@{/register}">Select Plan</a></p>
-                    <button class="remove-button">Remove Package</button>
-                   <p> <a class="edit-button" th:href="@{edit-subscription}">Edit</a> </p>
-                </div>
-            </div>
+
         </div>
 
     </div>

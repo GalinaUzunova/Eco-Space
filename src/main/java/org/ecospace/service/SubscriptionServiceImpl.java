@@ -32,7 +32,7 @@ public class SubscriptionServiceImpl {
                         .type(subDto.getType())
                         .price(subDto.getPrice())
                         .namePackage(subDto.getNamePackage())
-                        .isActive(true)
+
                         .description(subDto.getDescription())
                         .build();
 
@@ -74,7 +74,7 @@ public class SubscriptionServiceImpl {
             subscription.setNamePackage(edited.getNamePackage());
             subscription.setPrice(edited.getPrice());
             subscription.setDescription(edited.getDescription());
-            subscription.setActive(true);
+
 
             this.subscriptionRepository.save(subscription);
 

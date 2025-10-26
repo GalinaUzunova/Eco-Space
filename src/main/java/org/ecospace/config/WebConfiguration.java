@@ -1,23 +1,66 @@
 package org.ecospace.config;
 
-import org.ecospace.security.SessionInterceptor;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.ecospace.init.CustomAuthenticationSuccessHandler;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.core.annotation.Order;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
- @Configuration
+
+@Configuration
+
 public class WebConfiguration implements WebMvcConfigurer {
-  @Autowired
-    private  SessionInterceptor interseptor;
+
+    private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+
+    public WebConfiguration(CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler) {
+        this.customAuthenticationSuccessHandler = customAuthenticationSuccessHandler;
+    }
+
+
+    @Bean
+    @Order(1)
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity
+
+                .authorizeHttpRequests(matchers -> matchers
+                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                        .requestMatchers("/manager").hasRole("ADMIN")
+                        .requestMatchers("/client").hasRole("CLIENT")
+                        .requestMatchers("/", "/register", "/home", "/design", "/maintenance", "/contact").permitAll()
+                        .anyRequest().authenticated()
+
+                )
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
+                        .usernameParameter("username")
+                        .passwordParameter("password")
+                        .successHandler(customAuthenticationSuccessHandler)
+                        .failureUrl("/login?error")
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                                .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET"))
+                                .logoutSuccessUrl("/")
+
+
+                );
+
+        return httpSecurity.build();
+    }
 
 
 
-     @Override
-     public void addInterceptors(InterceptorRegistry registry) {
-         registry.addInterceptor(interseptor)
-                 .addPathPatterns("/**")
-                 .excludePathPatterns("/css/**",  "/js/**", "/images/**");
 
-     }
- }
+
+}

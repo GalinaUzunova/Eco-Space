@@ -8,9 +8,18 @@
 </head>
 <body>
 <div id="main-container">
-    <header id="main-header" th:replace="~{fragments/commons::nav}">
-        <h1 id="main-title">Client Portal</h1>
+    <header id="main-header" >
+        <h1 id="main-title">Manager Portal</h1>
         <h2 id="page-title">Add New Subscription Plan</h2>
+        <nav id="nav-container" th:replace="~{fragments/admin::nav}">
+
+<!--            <a th:href="@{home}" class="nav-button">Home</a>-->
+<!--            <a th:href="@{manager}" class="nav-button">Manager</a>-->
+<!--            <a th:href="@{logout}" class="nav-button">Logout</a>-->
+
+
+
+        </nav>
 
 
     </header>
@@ -68,7 +77,7 @@
                             <td>
                                 <input  type="number" id="price" class="form-input"
                                         step="1"
-                                        max="0"
+
                                         th:field="*{price}"
                                        th:errorclass="'is-invalid alert-danger'"
 
