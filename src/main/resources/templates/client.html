@@ -23,7 +23,7 @@
 
 <!--                    <input type="file" id="image-upload"  >-->
 <!--&lt;!&ndash;                    accept="image/*" style="display: none;"&ndash;&gt;-->
-                    <button class="profile-image-upload" id="upload-button">+</button>
+                    <a class="profile-image-upload" id="upload-button" th:href="@{/edit-profile/update/{id}(id=${user.id})}">+</a>
                 </div>
                 <h2 id="client-name" class="profile-name" th:text="${user.username}">John Doe</h2>
             </div>

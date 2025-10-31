@@ -5,6 +5,7 @@ import org.ecospace.model.Product;
 import org.ecospace.model.Subscription;
 import org.ecospace.model.User;
 import org.ecospace.model.UserRole;
+import org.ecospace.model.dto.ProfileDto;
 import org.ecospace.model.dto.UserCardDto;
 import org.ecospace.model.dto.UserDto;
 import org.ecospace.repository.ProductRepository;
@@ -192,6 +193,21 @@ public class UserServiceImpl implements UserDetailsService {
     public List<User>getAllUsers(){
             List<User>allUsers=this.userRepository.getAllBy();
         return Objects.requireNonNullElseGet(allUsers, ArrayList::new);
+
+    }
+
+    public  void editProfile(ProfileDto profileDto, @AuthenticationPrincipal AuthenticationMetadata authenticationPriciple){
+            UUID userId=authenticationPriciple.getId();
+            Optional<User>byId=userRepository.findById(userId);
+            if(byId.isEmpty()){
+                throw new RuntimeException("Not authorized entering");
+            }
+            User user=byId.get();
+            user.setImage(profileDto.getProfileImage());
+            user.setUsername(profileDto.getUsername());
+            user.setPassword(profileDto.getPassword());
+
+            this.userRepository.save(user);
 
     }
 

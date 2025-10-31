@@ -6,9 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ecospace.model.Product;
 import org.ecospace.model.Subscription;
 import org.ecospace.model.User;
-import org.ecospace.model.dto.SubscriptionDtos;
-import org.ecospace.model.dto.UserCardDto;
-import org.ecospace.model.dto.UserDto;
+import org.ecospace.model.dto.*;
 import org.ecospace.security.AuthenticationMetadata;
 import org.ecospace.service.ProductServiceImpl;
 import org.ecospace.service.SubscriptionServiceImpl;
@@ -49,6 +47,11 @@ public class UserController {
     private UserCardDto cardDto() {
         return new UserCardDto();
     }
+    @ModelAttribute("editProfile")
+    private ProfileDto profileDto(){
+        return  new ProfileDto();
+    }
+
 
 
     public UserController(UserServiceImpl userService, SubscriptionServiceImpl subscriptionService, ProductServiceImpl productService) {
@@ -192,6 +195,29 @@ public class UserController {
 
         return "renew";
 
+    }
+    @GetMapping("/edit-profile/update/{id}")
+
+    private String viewProfile(@PathVariable("id") UUID id,Model model){
+      User user=this.userService.byId(id);
+        ProfileDto editProfile= ProfileDtoMapper.fromUser(user);
+        model.addAttribute("editProfile", editProfile);
+        model.addAttribute("user", user);
+
+        return "edit-profile";
+    }
+
+    @PutMapping("/edit-profile/update/{principal}")
+    public String editProfile( @AuthenticationPrincipal AuthenticationMetadata authenticationMetadata,@Valid ProfileDto profileDto,BindingResult bindingResult, RedirectAttributes redirectAttributes){
+         if(bindingResult.hasErrors()){
+             User user=userService.byId(authenticationMetadata.getId());
+             redirectAttributes.addFlashAttribute("user", user);
+             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.user", user);
+             return "redirect:/edit-profile";
+         }
+         this.userService.editProfile(profileDto,authenticationMetadata);
+
+        return "redirect:/client";
     }
 
 }
