@@ -1,10 +1,15 @@
 package org.ecospace.model.dto;
 
 
+import jakarta.persistence.Transient;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.validator.constraints.URL;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -15,15 +20,12 @@ import java.util.UUID;
 public class ProfileDto {
 
     private UUID id;
-
+    @Size(min = 6, max = 20, message = "Username must be between 6 and 20 characters!")
     private String username;
-
+    @Email
     private String email;
 
-    private String profileImage;
-
-    private String password;
-
-
+    @URL
+    private String imageURL;
 
 }

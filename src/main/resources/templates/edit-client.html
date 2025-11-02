@@ -23,6 +23,7 @@
             <table class="project-table">
                 <thead>
                 <tr>
+                    <th>Client id</th>
                     <th>Client Name</th>
                     <th>Email</th>
                     <th>Role</th>
@@ -32,15 +33,18 @@
                 </thead>
                 <tbody>
                 <tr th:each="client : ${clients}">
-                    <td th:text="${client.username}">John Doe</td>
-                    <td th:text="${client.email}">john@example.com</td>
+                    <td th:text="${client.id}"></td>
+                    <td th:text="${client.username}"></td>
+                    <td th:text="${client.email}"></td>
                     <td>
                             <span
                                     th:text="${client.role}">Active</span>
                     </td>
                     <td th:text="${#temporals.format(client.createdOn, 'dd/MM/yyyy')}">01/01/2024</td>
                     <td>
-                        <button class="status-button">Switch Role</button>
+                        <form th:action="@{/edit-client/update/{id}(id=${client.id})}" th:method="POST" style="display: inline;">
+                            <button type="submit" class="status-button">Switch Role</button>
+                        </form>
                     </td>
                 </tr>
                 </tbody>

@@ -10,15 +10,7 @@
     <header id="main-header" >
         <h1 id="main-title">EcoSpace</h1>
         <h2 id="page-title">Renew Information</h2>
-        <nav id="nav-container">
 
-            <a th:href="@{home}" class="nav-button">Home</a>
-
-            <a th:href="@{logout}" class="nav-button">Logout</a>
-
-
-
-        </nav>
     </header>
 
 
@@ -153,7 +145,7 @@
             </table>
 
             <div class="form-actions">
-                <button type="button" class="cancel-button">Cancel</button>
+                <a th:href="@{/client}" type="button" class="cancel-button">Cancel</a>
                 <button type="submit" class="form-submit">Pay</button>
             </div>
         </form>

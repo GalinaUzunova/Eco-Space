@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -201,23 +202,28 @@ public class UserController {
     private String viewProfile(@PathVariable("id") UUID id,Model model){
       User user=this.userService.byId(id);
         ProfileDto editProfile= ProfileDtoMapper.fromUser(user);
-        model.addAttribute("editProfile", editProfile);
         model.addAttribute("user", user);
+        model.addAttribute("editProfile", editProfile);
 
         return "edit-profile";
     }
 
-    @PutMapping("/edit-profile/update/{principal}")
-    public String editProfile( @AuthenticationPrincipal AuthenticationMetadata authenticationMetadata,@Valid ProfileDto profileDto,BindingResult bindingResult, RedirectAttributes redirectAttributes){
+   @PutMapping ("/edit-profile/update/{id}")
+    public String editProfile(@PathVariable("id") UUID id, @AuthenticationPrincipal AuthenticationMetadata authenticationMetadata,@Valid ProfileDto editProfile,BindingResult bindingResult, RedirectAttributes redirectAttributes) throws IOException {
+
          if(bindingResult.hasErrors()){
-             User user=userService.byId(authenticationMetadata.getId());
+             User user=userService.byId(id);
              redirectAttributes.addFlashAttribute("user", user);
              redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.user", user);
+             System.out.println("Password nol log");
              return "redirect:/edit-profile";
          }
-         this.userService.editProfile(profileDto,authenticationMetadata);
-
-        return "redirect:/client";
+         this.userService.editProfile(editProfile,id,authenticationMetadata);
+         String role=authenticationMetadata.getRole().toString();
+         if(role.equals("ADMIN")) {
+           return "redirect:/manager";
+       }
+       return "redirect:/client";
     }
 
 }

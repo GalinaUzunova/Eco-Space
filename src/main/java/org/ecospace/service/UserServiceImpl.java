@@ -19,7 +19,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
@@ -28,119 +27,115 @@ import java.util.*;
 public class UserServiceImpl implements UserDetailsService {
 
 
-
-        private final UserRepository userRepository;
-        private final PasswordEncoder passwordEncoder;
-        private final SubscriptionServiceImpl subscriptionService;
-        private final ProductRepository productRepository;
-
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final SubscriptionServiceImpl subscriptionService;
+    private final ProductRepository productRepository;
 
 
 
+    @Autowired
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, SubscriptionServiceImpl subscriptionService, ProductRepository productRepository) {
+        this.userRepository = userRepository;
 
-        @Autowired
-        public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, SubscriptionServiceImpl subscriptionService, ProductRepository productRepository) {
-            this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
 
-            this.passwordEncoder = passwordEncoder;
+        this.subscriptionService = subscriptionService;
 
-            this.subscriptionService = subscriptionService;
+        this.productRepository = productRepository;
+    }
 
-            this.productRepository = productRepository;
+    @Transactional
+    public boolean userRegister(UserDto userDto) {
+        Optional<User> byUsernameAndEmail = this.userRepository.findByUsernameAndEmail(userDto.getUsername(), userDto.getEmail());
+
+        if (byUsernameAndEmail.isPresent()) {
+
+            return false;
         }
 
-        @Transactional
-        public boolean userRegister(UserDto userDto) {
-            Optional<User> byUsernameAndEmail = this.userRepository.findByUsernameAndEmail(userDto.getUsername(), userDto.getEmail());
-
-            if (byUsernameAndEmail.isPresent()) {
-
-                return false;
-            }
-
-            User user = new User();
-            user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-            user.setUsername(userDto.getUsername());
-            user.setEmail(userDto.getEmail());
-            user.setActive(true);
-            user.setCreatedOn(LocalDateTime.now());
+        User user = new User();
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        user.setUsername(userDto.getUsername());
+        user.setEmail(userDto.getEmail());
+        user.setActive(true);
+        user.setCreatedOn(LocalDateTime.now());
 
 
-
-            if(this.userRepository.count()<=0){
-                user.setRole(UserRole.ADMIN);
-            }else {
-                user.setRole(UserRole.CLIENT);
-            }
-
-            userRepository.save(user);
-
-
-            return true;
-
+        if (this.userRepository.count() <= 0) {
+            user.setRole(UserRole.ADMIN);
+        } else {
+            user.setRole(UserRole.CLIENT);
         }
 
+        userRepository.save(user);
 
 
+        return true;
 
-        public User byId(UUID id) {
-            Optional<User> userById = this.userRepository.findById(id);
-
-            if (userById.isEmpty()) {
-                throw new RuntimeException("Not exsist");
+    }
 
 
-            }
-            return userById.get();
-        }
+    public User byId(UUID id) {
+        Optional<User> userById = this.userRepository.findById(id);
 
-        public List<Product> getClentSubs(UUID id){
+        if (userById.isEmpty()) {
+            throw new RuntimeException("Not exist");
 
-            return this.userRepository.findUserSubs(id);
-        }
-        @Transactional
-        public boolean renew(@AuthenticationPrincipal AuthenticationMetadata authenticationPriciple, UserCardDto cardDto, UUID id) {
-
-
-            Optional<User> user=userRepository.findById(authenticationPriciple.getId());
-            if(user.isEmpty()){
-                return false;
-
-            }
-            //chek if is not expired-comapre dates;
-            //check if its enough funds;
-
-
-          Product product= this.userRepository.findUserSubs(authenticationPriciple.getId())
-                    .stream().filter(p->p.getId().equals(id)).findFirst().orElse(null);
-                if(product == null){
-
-                    return false;
-                }
-                product.setActive(true);
-                product.setCreatedOn(LocalDateTime.now());
-                product.setExpired(createSubscriptionPeriod(product.getNamePackage()));
-
-
-            return true;
 
         }
- @Transactional
+        return userById.get();
+    }
+
+    public List<Product> getClentSubs(UUID id) {
+
+        return this.userRepository.findUserSubs(id);
+    }
+
+    @Transactional
+    public boolean renew(@AuthenticationPrincipal AuthenticationMetadata authenticationPriciple, UserCardDto cardDto, UUID id) {
+
+
+        Optional<User> user = userRepository.findById(authenticationPriciple.getId());
+        if (user.isEmpty()) {
+            return false;
+
+        }
+        //chek if is not expired-comapre dates;
+        //check if its enough funds;
+
+
+        Product product = this.userRepository.findUserSubs(authenticationPriciple.getId())
+                .stream().filter(p -> p.getId().equals(id)).findFirst().orElse(null);
+        if (product == null) {
+
+            return false;
+        }
+        product.setActive(true);
+        product.setCreatedOn(LocalDateTime.now());
+        product.setExpired(createSubscriptionPeriod(product.getNamePackage()));
+
+
+        return true;
+
+    }
+
+    @Transactional
     public void buyProduct(@AuthenticationPrincipal AuthenticationMetadata authenticationPriciple, UserCardDto cardDto, UUID id) {
 
 
         UUID userId = authenticationPriciple.getId();
-       Optional<User>byId =userRepository.findById(userId);
-       if(byId.isEmpty()){
-           throw new RuntimeException("User dost exist!");
-       }
+        Optional<User> byId = userRepository.findById(userId);
+        if (byId.isEmpty()) {
+            throw new RuntimeException("User dost exist!");
+        }
         //chek if is not expired-comapre dates;
         //check if its enough funds;
-      User user=byId.get();
+        User user = byId.get();
 
-       Subscription subscription = subscriptionService.byId(id);
+        Subscription subscription = subscriptionService.byId(id);
 
-      Product product=new Product();
+        Product product = new Product();
 
         product.setNamePackage(subscription.getNamePackage());
         product.setPrice(subscription.getPrice());
@@ -154,9 +149,6 @@ public class UserServiceImpl implements UserDetailsService {
         this.productRepository.save(product);
 
 
-
-
-
         List<Product> productList = new ArrayList<>(userRepository.findUserSubs(userId));
         productList.add(product);
 
@@ -166,48 +158,56 @@ public class UserServiceImpl implements UserDetailsService {
 
     }
 
-   public LocalDateTime createSubscriptionPeriod( String packageName) {
+    public LocalDateTime createSubscriptionPeriod(String packageName) {
 
-          LocalDateTime expiresOn=LocalDateTime.now();
+        LocalDateTime expiresOn = LocalDateTime.now();
         if (packageName.contains("Monthly")) {
-            expiresOn=LocalDateTime.now().plusMonths(1);
+            expiresOn = LocalDateTime.now().plusMonths(1);
         } else if (packageName.contains("Year")) {
-            expiresOn=LocalDateTime.now().plusYears(1);
+            expiresOn = LocalDateTime.now().plusYears(1);
         } else if (packageName.contains("6-Month")) {
-            expiresOn=LocalDateTime.now().plusMonths(6);
+            expiresOn = LocalDateTime.now().plusMonths(6);
 
         }
-        expiresOn= expiresOn.with(LocalTime.MAX);
+        expiresOn = expiresOn.with(LocalTime.MAX);
 
         return expiresOn;
     }
 
-    public List<User>getAllUsersAndSubs(){
-            if( this.userRepository.findAllByAndProductList()!=null){
-                return  this.userRepository.findAllByAndProductList();
-            }
+    public List<User> getAllUsersAndSubs() {
+        if (this.userRepository.findAllByAndProductList() != null) {
+            return this.userRepository.findAllByAndProductList();
+        }
 
-       return new ArrayList<>();
+        return new ArrayList<>();
     }
 
-    public List<User>getAllUsers(){
-            List<User>allUsers=this.userRepository.getAllBy();
+    public List<User> getAllUsers() {
+        List<User> allUsers = this.userRepository.getAllBy();
         return Objects.requireNonNullElseGet(allUsers, ArrayList::new);
 
     }
 
-    public  void editProfile(ProfileDto profileDto, @AuthenticationPrincipal AuthenticationMetadata authenticationPriciple){
-            UUID userId=authenticationPriciple.getId();
-            Optional<User>byId=userRepository.findById(userId);
-            if(byId.isEmpty()){
-                throw new RuntimeException("Not authorized entering");
-            }
-            User user=byId.get();
-            user.setImage(profileDto.getProfileImage());
-            user.setUsername(profileDto.getUsername());
-            user.setPassword(profileDto.getPassword());
+    public void editProfile(ProfileDto profileDto, UUID id, @AuthenticationPrincipal AuthenticationMetadata authenticationPriciple)  {
 
-            this.userRepository.save(user);
+        if (!id.equals(authenticationPriciple.getId())) {
+            throw new RuntimeException("Not authorized operation");
+        }
+        UUID userId = authenticationPriciple.getId();
+        Optional<User> byId = userRepository.findById(userId);
+        if (byId.isEmpty()) {
+            throw new RuntimeException("Not authorized entering");
+        }
+        User user = byId.get();
+        if (profileDto.getImageURL() != null && !profileDto.getImageURL().isEmpty()) {
+            user.setImage(profileDto.getImageURL());
+
+
+        }
+        user.setEmail(profileDto.getEmail());
+        user.setUsername(profileDto.getUsername());
+        this.userRepository.save(user);
+
 
     }
 
@@ -215,10 +215,43 @@ public class UserServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-            User user=this.userRepository.findByUsername(username).orElseThrow(()-> new UsernameNotFoundException("User doesn't exist"));
-        return new AuthenticationMetadata(user.getUsername(),user.getPassword(),user.getId(),user.getRole(),user.isActive());
+        User user = this.userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User doesn't exist"));
+        return new AuthenticationMetadata(user.getUsername(), user.getPassword(), user.getId(), user.getRole(), user.isActive());
     }
+
+
+    public User getAdmin(@AuthenticationPrincipal AuthenticationMetadata principal) {
+
+        Optional<User> user = this.userRepository.findById(principal.getId());
+
+        if (user.isPresent()) {
+            return user.get();
+
+
+        }
+        throw new RuntimeException("User not exsist");
+    }
+
+
+
+        public void changeRole(UUID id) {
+            User user = this.userRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+
+
+            if (user.getRole() == UserRole.CLIENT) {
+                user.setRole(UserRole.ADMIN);
+            } else if (user.getRole() == UserRole.ADMIN) {
+                user.setRole(UserRole.CLIENT);
+            }
+
+
+            this.userRepository.save(user);
+        }
+
+
 }
+
 
 
 

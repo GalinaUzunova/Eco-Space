@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -131,46 +131,54 @@
 <div class="container">
 
 
-        <form th:action="@{/edit-profile/update}" method="PUT" enctype="multipart/form-data"
+        <form th:action="@{/edit-profile/update/{id}(id=${user.id})}" th:method="PUT"
               th:object="${editProfile}"
         >
 
             <div class="profile-picture">
-                <img th:src=
-                        "@{/images/default-profile.png}"
-                     alt="Profile Picture"  >
+                <img th:src="${editProfile.getImageURL()}"
+
+                alt="Profile Picture"  >
             </div>
 
             <div class="form-group">
-                <label for="profileImage">Change Profile Picture</label>
-                <input type="file" id="profileImage" name="profileImage"
-                       class="form-control" accept="image/*" th:field="*{profileImage}">
+                <label for="imageURl">Change Profile Picture</label>
+                <input type="text" id="imageURl" placeholder="Image Link" name="imageURl"
+                       class="form-control" accept="image/*" th:field="*{imageURL}">
+                <p class="alert-warning" th:if="${#fields.hasErrors('imageURL')}">Invalid URL format</p>
             </div>
 
             <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username"
-                       th:field="*{username}" class="form-control" required>
+                       th:field="*{username}" class="form-control"
+                       th:errorclass="'is-invalid alert-danger'">
+                <span class="invalid-feedback  bg-danger text-light rounded text-danger" style="font-size: 10px"
+                        th:if="${#fields.hasErrors('username')}"
+                      th:errorclass="error"
+                      th:errors="*{username}"></span>
             </div>
 
             <div class="form-group">
                 <label for="email">Email</label>
                 <input type="email" id="email" name="email"
-                       th:field="*{email}" class="form-control" required>
+                       th:field="*{email}" class="form-control"
+                       th:errorclass="'is-invalid alert-danger'">
+
+                <span class="invalid-feedback  bg-danger text-light rounded text-danger" style="font-size: 10px"
+                        th:if="${#fields.hasErrors('email')}"
+                     th:errorclass="error"
+                     th:errors="*{email}"></span>
             </div>
 
-            <div class="form-group">
-                <label for="password">New Password (leave blank to keep current)</label>
-                <input type="password" id="password" name="password"
-                       class="form-control"   th:field="*{password}">
-            </div>
 
             <div class="form-actions">
-                <a th:href="@{/client}" class="btn btn-secondary">Cancel</a>
-                <a th:href="@{/client}" type="submit" class="btn btn-primary">Save Changes</a>
+                <a sec:authorize="hasRole('CLIENT')" th:href="@{/client}" class="btn btn-secondary">Cancel</a>
+                <a sec:authorize="hasRole('ADMIN')" th:href="@{/manager}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
             </div>
         </form>
     </div>
-</div>
+
 </body>
 </html>

@@ -20,9 +20,6 @@
             <i class="fas fa-arrow-circle-right"></i> HOME
         </a>
 
-        <button class="menu-button">
-            <i class="fas fa-user"></i> Edit Profile
-        </button>
 
         <a th:href="@{/add-subscription}" class="menu-button" style="text-decoration: none; display: block;">
             <i class="fas fa-plus-circle"></i> Add New Subscription
@@ -57,37 +54,18 @@
     <section class="content-section">
         <div class="profile-container">
             <div class="profile-image-container">
-                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                     alt="Profile Picture" class="profile-image">
-                <button class="profile-image-upload">
-                    <i class="fas fa-camera"></i>
-                </button>
+                <img  id="profile-image"
+                      class="profile-image" th:src="${user.getImage() ?: '/images/default-user.jpg'}"  alt="Profile Picture" >
+
             </div>
-            <h2 class="profile-name">John Manager</h2>
-            <p class="section-text">Senior Manager | Subscription Department</p>
+            <h2 class="profile-name" th:text="${user.username}">John Manager</h2>
+            <p class="section-text" th:text="${user.email}">Senior Manager | Subscription Department</p>
         </div>
 
         <h3 class="section-title">Personal Information</h3>
         <div class="form-container">
-            <table class="form-table">
-                <tr>
-                    <td class="form-label">Full Name:</td>
-                    <td><input type="text" class="form-input" value="John Manager"></td>
-                </tr>
-                <tr>
-                    <td class="form-label">Email:</td>
-                    <td><input type="email" class="form-input" value="john.manager@example.com"></td>
-                </tr>
-                <tr>
-                    <td class="form-label">Phone:</td>
-                    <td><input type="tel" class="form-input" value="+1 (555) 123-4567"></td>
-                </tr>
-                <tr>
-                    <td class="form-label">Department:</td>
-                    <td><input type="text" class="form-input" value="Subscription Management"></td>
-                </tr>
-            </table>
-            <button class="form-submit">Update Profile</button>
+
+            <a th:href="@{/edit-profile/update/{id}(id=${user.id})}" class="form-submit">Update Profile</a>
         </div>
     </section>
 

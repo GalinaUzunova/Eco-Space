@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
 
+
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -33,7 +35,7 @@ public class User  extends BaseEntity {
     private UserRole role;
 
     private LocalDateTime createdOn;
-      @Column(columnDefinition = "Blob")
+
     private String image;
 
 
