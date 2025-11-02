@@ -209,7 +209,7 @@ public class UserController {
     }
 
    @PutMapping ("/edit-profile/update/{id}")
-    public String editProfile(@PathVariable("id") UUID id, @AuthenticationPrincipal AuthenticationMetadata authenticationMetadata,@Valid ProfileDto editProfile,BindingResult bindingResult, RedirectAttributes redirectAttributes) throws IOException {
+    public String editProfile(@PathVariable("id") UUID id, @AuthenticationPrincipal AuthenticationMetadata authenticationMetadata,@Valid ProfileDto editProfile,BindingResult bindingResult, RedirectAttributes redirectAttributes)  {
 
          if(bindingResult.hasErrors()){
              User user=userService.byId(id);
