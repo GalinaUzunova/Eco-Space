@@ -1,12 +1,11 @@
 spring:
-  # Database Configuration
+
   datasource:
     url: jdbc:mysql://localhost:3306/eco-space?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true&serverTimezone=UTC
     username: root
     password: '1234'
     driver-class-name: com.mysql.cj.jdbc.Driver
 
-  # JPA Configuration
   jpa:
     hibernate:
       ddl-auto: update
@@ -17,54 +16,46 @@ spring:
         format_sql: true
     open-in-view: false
 
-  # Email Configuration
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: gbuzunova13@gmail.com
-    password: your-app-password
-    protocol: smtp
-    default-encoding: UTF-8
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-          connection-timeout: 5000
-          timeout: 5000
-          write-timeout: 5000
 
-  # Task Scheduling
   task:
     scheduling:
       pool:
         size: 5
 
-  # Spring MVC
+
   mvc:
     hiddenmethod:
       filter:
         enabled: true
 
-  # Security (basic auth)
+
   security:
     user:
       name: user
       password: '123'
 
-# Server Configuration
+
 server:
   port: 8084
 
-# Logging
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 15000
+
 logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql: TRACE
     org.ecospace: DEBUG
 
-# Custom Application Properties
+
+
+
+
+#  Custom Application Properties
 app:
   email:
     from: your-email@gmail.com

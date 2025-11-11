@@ -1,4 +1,4 @@
-package org.ecospace.notification;
+package org.ecospace.notification.service;
 
 import org.ecospace.event.SubscriptionRenewEvent;
 import org.springframework.context.event.EventListener;
@@ -14,8 +14,7 @@ public class NotificationService {
 
     public  void  sendNotification(SubscriptionRenewEvent event){
 
-
-        System.out.printf("Send it to user %s with renewl Date %s",event.getUsername(),event.getExpiredOn());
+        System.out.printf("Send it to user %s with renewal Date %s",event.getUsername(),event.getExpiredOn());
 
     }
 }
