@@ -21,8 +21,6 @@ public class CustomAuthenticationSuccessHandler implements org.springframework.s
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         String redirectUrl = determineTargetUrl(authorities);
 
-        System.out.println("Authentication successful. Redirecting to: " + redirectUrl);
-        System.out.println("User authorities: " + authorities);
         response.sendRedirect(request.getContextPath() + redirectUrl);
 
     }

@@ -21,8 +21,6 @@
                          th:src="${user.getImage() ?: '/images/default-user.jpg'}"
                          alt="Profile Image">
 
-<!--                    <input type="file" id="image-upload"  >-->
-<!--&lt;!&ndash;                    accept="image/*" style="display: none;"&ndash;&gt;-->
                     <a class="profile-image-upload" id="upload-button" th:href="@{/edit-profile/update/{id}(id=${user.id})}">+</a>
                 </div>
                 <h2 id="client-name" class="profile-name" th:text="${user.username}">John Doe</h2>
@@ -37,10 +35,10 @@
                 <div>
 
                     <select id="subscription-dropdown" class="subscription-dropdown"
-                            th:field="*{id}"
-                            th:errorclass="'is-invalid alert-danger'"
+                            th:field="*{id}" required>
+<!--                            th:errorclass="'is-invalid alert-danger'"-->
                     >
-                        <option value="">-- Select a subscription --</option>
+                        <option value="" >-- Select a subscription --</option>
                         <option th:each="sub : ${clientSubs}"
                                 th:value="${sub.id}"
                               th:text="|${sub.namePackage} -
@@ -48,11 +46,9 @@
                                       Expires On: ${#temporals.format(sub.expired, 'dd/MM/yyyy')}|">
                         </option>
 
+
                     </select>
-                    <span class="invalid-feedback text-danger" style="font-size: 10px"
-                          th:if="${#fields.hasErrors('id')}"
-                          th:errorclass="error"
-                          th:errors="*{id}"></span>
+
                     <div class="subscription-actions">
                         <button type="submit" id="renew-button" class="action-button renew-button">
                             Renew Subscription

@@ -8,10 +8,7 @@
 <div id="main-container">
     <header id="main-header"  th:replace="~{fragments/commons::nav}">
         <h1 id="main-title">EcoSpace Contact Us</h1>
-<!--    <a th:href="@{home}" class="nav-button">Home</a>-->
 
-<!--    <a th:href="@{login}" class="nav-button">Login</a>-->
-<!--        <a th:href="@{register}" class="nav-button">Register</a>-->
 
     </header>
 
@@ -24,26 +21,76 @@
             <p class="section-text"><strong>Phone:</strong> +270845002097</p>
         </div>
 
+        <div id="successMessage" class="success-message" th:if="${success}" style="color: #28a745; font-size: 1.5rem; font-weight: bold;">
+            <p>Thank you for your message! We'll get back to you within 24-48 hours.</p>
+        </div>
+
+
+        <div id="errorMessage" class="error-message" th:if="${error}" style="color: #c82333; font-size: 1.5rem; font-weight: bold;">
+            <p>Sorry, there was an error sending your message. Please try again later.</p>
+        </div>
+    </div>
+
         <div class="content-section">
             <h3 class="section-title">Send us a Message</h3>
 
-            <form class="form-container">
+            <form class="form-container" th:method="POST" th:action="@{/contact}" th:object="${formDto}">
                 <table class="form-table">
                     <tr>
-                        <td class="form-label">Name:</td>
-                        <td><input type="text" class="form-input" name="name" required></td>
+                        <td class="form-label" >Name:</td>
+                        <td><input type="text" class="form-input" name="name"
+                                   th:field="*{name}"
+                                   th:errorclass="'is-invalid alert-danger'"
+                                   required>
+
+                            <span class="invalid-feedback  bg-danger text-light rounded text-danger" style="font-size: 10px"
+                                  th:if="${#fields.hasErrors('name')}"
+                                  th:errorclass="error"
+                                  th:errors="*{name}"></span>
+
+                        </td>
                     </tr>
                     <tr>
                         <td class="form-label">Email:</td>
-                        <td><input type="email" class="form-input" name="email" required></td>
+                        <td><input type="email" class="form-input" name="email"
+                                   th:field="*{email}"
+                                   th:errorclass="'is-invalid alert-danger'"
+                                   required>
+
+                            <span class="invalid-feedback  bg-danger text-light rounded text-danger" style="font-size: 10px"
+                                  th:if="${#fields.hasErrors('email')}"
+                                  th:errorclass="error"
+                                  th:errors="*{email}"></span>
+
+                        </td>
                     </tr>
                     <tr>
                         <td class="form-label">Phone:</td>
-                        <td><input type="tel" class="form-input" name="phone"></td>
+                        <td><input type="tel" class="form-input" name="phone"
+                                   th:field="*{phone}"
+                                   th:errorclass="'is-invalid alert-danger'"
+
+                        >
+                            <span class="invalid-feedback  bg-danger text-light rounded text-danger" style="font-size: 10px"
+                                  th:if="${#fields.hasErrors('phone')}"
+                                  th:errorclass="error"
+                                  th:errors="*{phone}"></span>
+
+                        </td>
                     </tr>
                     <tr>
                         <td class="form-label">Message:</td>
-                        <td><textarea class="form-input" name="message" rows="5" required></textarea></td>
+                        <td><textarea class="form-input" name="message" rows="5"
+                                      th:field="*{message}"
+                                      th:errorclass="'is-invalid alert-danger'"
+                                      required></textarea>
+
+                            <span class="invalid-feedback  bg-danger text-light rounded text-danger" style="font-size: 10px"
+                                  th:if="${#fields.hasErrors('message')}"
+                                  th:errorclass="error"
+                                  th:errors="*{message}"></span>
+
+                        </td>
                     </tr>
                     <tr>
                         <td colspan="2">
@@ -52,7 +99,8 @@
                     </tr>
                 </table>
             </form>
-        </div>
+
+
     </div>
 
     <footer id="main-footer">
