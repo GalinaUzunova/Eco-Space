@@ -32,13 +32,13 @@
                     <ul class="description-ul" th:text="${sub.description}">
 
                     </ul>
-                    <p class="buy-button" >
-                        <a sec:authorize="hasRole('CLIENT')"
+<!--                    <p sec:authorize="!isAuthenticated()" class="buy-button" >-->
+                        <a class="buy-button" sec:authorize="hasRole('CLIENT')"
                            th:href ="@{/payment/{id}(id=${sub.getId()})}">Buy Now</a>
 
-                        <a sec:authorize="!isAuthenticated()"
+                        <a class="buy-button" sec:authorize="!isAuthenticated()"
                            th:href="@{/register}"
-                           class="btn btn-primary">
+                         >
                             Select Plan
                         </a>
 
@@ -48,24 +48,6 @@
                 </div>
             </div>
 
-            <div class="package package-6d-standard">
-                <div class="package-header">6-Month Package</div>
-                <div class="package-price">R 6000</div>
-                <div class="package-features">
-                    <ul>
-                        <li>Everything in Monthly Package</li>
-                        <li>Bi-weekly detailed inspection</li>
-                        <li>Advanced plant care</li>
-                        <li>Soil quality testing</li>
-                        <li>Fertilization service</li>
-                        <li>Pest control management</li>
-                        <li>Seasonal planting</li>
-                    </ul>
-                    <p class="buy-button"><a th:href ="@{login}">Select Plan</a></p>
-                    <button class="remove-button">Remove Package</button>
-                    <p><a class="edit-button" th:href="@{edit-subscription}">Edit</a></p>
-                </div>
-            </div>
 
 
         </div>

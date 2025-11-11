@@ -1,4 +1,4 @@
-package org.ecospace.controler;
+package org.ecospace.web.controler;
 
 
 
@@ -16,15 +16,13 @@ public class HomeController {
 
 
 
-
-    @GetMapping("/contact")
-
-    public String viewContact(Model model){
-
-        model.addAttribute("currentPage","contact");
-        return "contact";
-    }
-
+//    @GetMapping("/contact")
+//
+//    public String viewContact(Model model) {
+//
+//        model.addAttribute("currentPage", "contact");
+//        return "contact";
+//    }
 
     @GetMapping("/home")
 

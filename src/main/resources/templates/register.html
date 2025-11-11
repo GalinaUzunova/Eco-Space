@@ -27,15 +27,20 @@
 
                 <tr>
                     <td class="form-label">Username:</td>
-                    <td><input type="text" class="form-input"
+
+
+                    <td>
+                        <input type="text" class="form-input"
                                th:field="*{username}"
                                id="username"
                                th:errorclass="'is-invalid alert-danger'">
 
+
                         <span class="invalid-feedback  bg-danger text-light rounded text-danger" style="font-size: 10px"
                               th:if="${#fields.hasErrors('username')}"
                               th:errorclass="error"
-                              th:errors="*{username}">
+                              th:errors="*{username}"
+                        >
 
                         </span>
 
@@ -56,20 +61,11 @@
                 </tr>
 
 
-<!--                <tr>-->
-<!--                    <td class="form-label">Picture:</td>-->
-<!--                    <td><input type="text" class="form-input" id="image" th:field="*{image}"-->
-
-<!--                    >-->
-<!--                    </td>-->
-
-
-<!--                </tr>-->
-<!--                <tr>-->
+                <tr>
                     <td class="form-label">Password:</td>
-                    <td><input type="password" class="form-input" id="password"
-                               th:field="*{password}"
-                               th:errorclass="'is-invalid alert-danger'">
+                    <td><label for="password"></label><input type="password" class="form-input" id="password"
+                                                             th:field="*{password}"
+                                                             th:errorclass="'is-invalid alert-danger'">
 
                         <span class="invalid-feedback text-danger" style="font-size: 10px"
                               th:if="${#fields.hasErrors('password')}"
@@ -79,8 +75,10 @@
 
                 <tr>
                     <td class="form-label">Confirm Password:</td>
-                    <td><input type="password" class="form-input" id="confirm-password"
+                    <td>
+                        <input type="password" class="form-input" id="confirm-password"
                                th:field="*{confirmPassword}">
+
 
 
                         <span class="invalid-feedback text-danger" style="font-size: 10px"

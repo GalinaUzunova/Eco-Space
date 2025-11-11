@@ -19,6 +19,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
@@ -33,26 +34,24 @@ public class UserServiceImpl implements UserDetailsService {
     private final ProductRepository productRepository;
 
 
-
     @Autowired
     public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, SubscriptionServiceImpl subscriptionService, ProductRepository productRepository) {
         this.userRepository = userRepository;
-
         this.passwordEncoder = passwordEncoder;
-
         this.subscriptionService = subscriptionService;
-
         this.productRepository = productRepository;
     }
 
+    public boolean userExists(UserDto userDto){
+            return userRepository.findByUsername(userDto.getUsername())
+                    .isPresent();
+        }
+
+
+
+
     @Transactional
     public boolean userRegister(UserDto userDto) {
-        Optional<User> byUsernameAndEmail = this.userRepository.findByUsernameAndEmail(userDto.getUsername(), userDto.getEmail());
-
-        if (byUsernameAndEmail.isPresent()) {
-
-            return false;
-        }
 
         User user = new User();
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
@@ -61,18 +60,13 @@ public class UserServiceImpl implements UserDetailsService {
         user.setActive(true);
         user.setCreatedOn(LocalDateTime.now());
 
-
         if (this.userRepository.count() <= 0) {
             user.setRole(UserRole.ADMIN);
         } else {
             user.setRole(UserRole.CLIENT);
         }
-
         userRepository.save(user);
-
-
         return true;
-
     }
 
 
@@ -188,7 +182,7 @@ public class UserServiceImpl implements UserDetailsService {
 
     }
 
-    public void editProfile(ProfileDto profileDto, UUID id, @AuthenticationPrincipal AuthenticationMetadata authenticationPriciple)  {
+    public void editProfile(ProfileDto profileDto, UUID id, @AuthenticationPrincipal AuthenticationMetadata authenticationPriciple) {
 
         if (!id.equals(authenticationPriciple.getId())) {
             throw new RuntimeException("Not authorized operation");
@@ -233,21 +227,20 @@ public class UserServiceImpl implements UserDetailsService {
     }
 
 
-
-        public void changeRole(UUID id) {
-            User user = this.userRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-
-
-            if (user.getRole() == UserRole.CLIENT) {
-                user.setRole(UserRole.ADMIN);
-            } else if (user.getRole() == UserRole.ADMIN) {
-                user.setRole(UserRole.CLIENT);
-            }
+    public void changeRole(UUID id) {
+        User user = this.userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
 
 
-            this.userRepository.save(user);
+        if (user.getRole() == UserRole.CLIENT) {
+            user.setRole(UserRole.ADMIN);
+        } else if (user.getRole() == UserRole.ADMIN) {
+            user.setRole(UserRole.CLIENT);
         }
+
+
+        this.userRepository.save(user);
+    }
 
 
 }

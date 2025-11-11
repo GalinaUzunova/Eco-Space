@@ -1,7 +1,6 @@
 package org.ecospace.model.dto;
 
 
-
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,4 +1,4 @@
-package org.ecospace.controler;
+package org.ecospace.web.controler;
 
 
 import org.ecospace.model.User;

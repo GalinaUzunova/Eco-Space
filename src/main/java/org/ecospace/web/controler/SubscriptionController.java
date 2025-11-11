@@ -1,4 +1,4 @@
-package org.ecospace.controler;
+package org.ecospace.web.controler;
 
 
 import jakarta.validation.Valid;
@@ -22,35 +22,37 @@ import java.util.UUID;
 public class SubscriptionController {
 
     private final SubscriptionServiceImpl subscriptionService;
+
     public SubscriptionController(SubscriptionServiceImpl subscriptionService) {
         this.subscriptionService = subscriptionService;
     }
+
     @ModelAttribute("editedDto")
-    public EditSubDto editedGet(){
+    public EditSubDto editedGet() {
 
         return new EditSubDto();
     }
+
     @ModelAttribute("subDto")
     public AddSubDto dto() {
         return new AddSubDto();
     }
+
     @ModelAttribute("subType")
-    public SubscriptionType []subType(){
+    public SubscriptionType[] subType() {
         return SubscriptionType.values();
     }
-
 
 
     @GetMapping("/design")
     public String viewDesign(Model model) {
 
-      List<DesignSubscriptionDto>byDesign=  subscriptionService.getDesignSubscriptions();
-      model.addAttribute("byDesign", byDesign);
-      model.addAttribute("currentPage", "design");
+        List<DesignSubscriptionDto> byDesign = subscriptionService.getDesignSubscriptions();
+        model.addAttribute("byDesign", byDesign);
+        model.addAttribute("currentPage", "design");
 
         return "design";
     }
-
 
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -72,33 +74,30 @@ public class SubscriptionController {
             return "redirect:/add-subscription";
         }
         subscriptionService.addNewSubscription(subDto);
-        if (subDto.getType().name().equals("DESIGN")) {
-            return "redirect:/design";
+            return "redirect:/manager";
         }
-        return "redirect:/maintenance";
 
-    }
+
+
 
 
     @GetMapping("/maintenance")
     public String viewMaintenance(Model model) {
-     List<MaintenanceSubDto> maintenanceSubscriptions= subscriptionService.getMaintenanceSubscriptions();
-      model.addAttribute("maintenanceSubscriptions",maintenanceSubscriptions);
-      model.addAttribute("currentPage","maintenance");
+        List<MaintenanceSubDto> maintenanceSubscriptions = subscriptionService.getMaintenanceSubscriptions();
+        model.addAttribute("maintenanceSubscriptions", maintenanceSubscriptions);
+        model.addAttribute("currentPage", "maintenance");
 
         return "maintenance";
     }
 
 
-
-
     @GetMapping("/edit-subscription/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-            public String viewEditForm(@PathVariable("id") UUID id,Model model) {
+    public String viewEditForm(@PathVariable("id") UUID id, Model model) {
 
 
-        Subscription subscription=subscriptionService.byId(id);
-        EditSubDto editedDto=DtoMapper.fromSubscription(subscription);
+        Subscription subscription = subscriptionService.byId(id);
+        EditSubDto editedDto = DtoMapper.fromSubscription(subscription);
         model.addAttribute("editedDto", editedDto);
         model.addAttribute("subscription", subscription);
 
@@ -106,36 +105,36 @@ public class SubscriptionController {
         return "/edit-subscription";
     }
 
-    @PutMapping ("/edit-subscription/{id}")
+    @PutMapping("/edit-subscription/{id}")
     @PreAuthorize("hasRole('ADMIN')")
 
-    public String viewEditSub(@PathVariable("id") UUID id,@Valid EditSubDto editedDto,BindingResult bindingResult,
-                              RedirectAttributes redirectAttributes){
+    public String viewEditSub(@PathVariable("id") UUID id, @Valid EditSubDto editedDto, BindingResult bindingResult,
+                              RedirectAttributes redirectAttributes) {
 
-     if(bindingResult.hasErrors()){
-       Subscription subscription=subscriptionService.byId(id);
-       redirectAttributes.addFlashAttribute("subscription", subscription);
-       redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.subscription",subscription);
+        if (bindingResult.hasErrors()) {
+            Subscription subscription = subscriptionService.byId(id);
+            redirectAttributes.addFlashAttribute("subscription", subscription);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.subscription", subscription);
 
-       return "/edit-subscription";
-     }
+            return "/edit-subscription";
+        }
 
         this.subscriptionService.editSubscription(id, editedDto);
-         if(editedDto.getType().name().equals("DESIGN")){
-             return "redirect:/design";
-         }
+        if (editedDto.getType().name().equals("DESIGN")) {
+            return "redirect:/design";
+        }
         return "redirect:/maintenance";
     }
 
     @GetMapping("edit-subscription/remove/{id}")
     @PreAuthorize("hasRole('ADMIN')")
 
-    public String removePackage(@PathVariable("id") UUID id ){
-         Subscription subscription=subscriptionService.byId(id);
-         subscriptionService.delete(id);
-         if(subscription.getType().toString().equals("DESIGN")){
-             return "redirect:/design";
-         }
+    public String removePackage(@PathVariable("id") UUID id) {
+        Subscription subscription = subscriptionService.byId(id);
+        subscriptionService.delete(id);
+        if (subscription.getType().toString().equals("DESIGN")) {
+            return "redirect:/design";
+        }
         return "redirect:/maintenance";
     }
 
