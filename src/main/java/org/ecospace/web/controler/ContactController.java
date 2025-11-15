@@ -11,22 +11,23 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-
 @Controller
 public class ContactController {
+
+    private final MessageService messageService;
 
     public ContactController(MessageService messageService) {
         this.messageService = messageService;
     }
 
     @ModelAttribute("formDto")
-    public ContactFormDto formDto(){
+    public ContactFormDto formDto() {
         return new ContactFormDto();
     }
 
-    private  final MessageService messageService;
+
     @GetMapping("/contact")
-    public String viewContactForm(Model model){
+    public String viewContactForm(Model model) {
         model.addAttribute("currentPage", "contact");
         return "contact";
 
@@ -56,6 +57,5 @@ public class ContactController {
     }
 
 
-
-    }
+}
 

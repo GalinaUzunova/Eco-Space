@@ -8,8 +8,6 @@ import org.ecospace.repository.SubscriptionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +15,6 @@ import java.util.UUID;
 
 @Service
 public class SubscriptionServiceImpl {
-
     private final SubscriptionRepository subscriptionRepository;
 
     public SubscriptionServiceImpl(SubscriptionRepository subscriptionRepository) {
@@ -26,7 +23,6 @@ public class SubscriptionServiceImpl {
 
     @Transactional
     public void addNewSubscription(AddSubDto subDto) {
-
         Subscription subscription =
                 Subscription.builder()
                         .type(subDto.getType())
@@ -35,33 +31,26 @@ public class SubscriptionServiceImpl {
 
                         .description(subDto.getDescription())
                         .build();
-
         this.subscriptionRepository.save(subscription);
-
-
     }
 
     public List<MaintenanceSubDto> getMaintenanceSubscriptions() {
-        List<MaintenanceSubDto>byMaintanace=new ArrayList<>();
-        List<Subscription> maintanaceSubscriptions = subscriptionRepository.getByType(SubscriptionType.MAINTANACE);
-        if (!maintanaceSubscriptions.isEmpty()) {
-            maintanaceSubscriptions.forEach(m->{
-                MaintenanceSubDto dto=new MaintenanceSubDto();
+        List<MaintenanceSubDto> byMaintenance = new ArrayList<>();
+        List<Subscription> maintenanceSubs = subscriptionRepository.getByType(SubscriptionType.MAINTANACE);
+        if (!maintenanceSubs.isEmpty()) {
+            maintenanceSubs.forEach(m -> {
+                MaintenanceSubDto dto = new MaintenanceSubDto();
                 dto.setId(m.getId());
                 dto.setPrice(m.getPrice());
                 dto.setDescription(m.getDescription());
                 dto.setNamePackage(m.getNamePackage());
                 dto.setType(m.getType());
-
-                byMaintanace.add(dto);
-
+                byMaintenance.add(dto);
             });
-            return byMaintanace;
+            return byMaintenance;
         }
         return new ArrayList<>();
     }
-
-
 
     @Transactional
     public void editSubscription(UUID id, EditSubDto edited) {
@@ -69,15 +58,12 @@ public class SubscriptionServiceImpl {
         Optional<Subscription> byId = this.subscriptionRepository.findById(id);
         if (byId.isPresent()) {
             Subscription subscription = byId.get();
-
             subscription.setType(edited.getType());
             subscription.setNamePackage(edited.getNamePackage());
             subscription.setPrice(edited.getPrice());
             subscription.setDescription(edited.getDescription());
 
-
             this.subscriptionRepository.save(subscription);
-
         }
     }
 
@@ -85,43 +71,32 @@ public class SubscriptionServiceImpl {
         Optional<Subscription> byId = this.subscriptionRepository.findById(id);
         if (byId.isPresent()) {
             return byId.get();
-
         }
         throw new RuntimeException("Package doesn't exist");
     }
 
-    public List<DesignSubscriptionDto>getDesignSubscriptions() {
-        List<DesignSubscriptionDto>designSubs=new ArrayList<>();
+    public List<DesignSubscriptionDto> getDesignSubscriptions() {
+        List<DesignSubscriptionDto> designSubs = new ArrayList<>();
         List<Subscription> designList = this.subscriptionRepository.getByType(SubscriptionType.DESIGN);
-
         if (!designList.isEmpty()) {
-            designList.forEach(d->{
-                DesignSubscriptionDto dto=new DesignSubscriptionDto();
+            designList.forEach(d -> {
+                DesignSubscriptionDto dto = new DesignSubscriptionDto();
                 dto.setNamePackage(d.getNamePackage());
                 dto.setId(d.getId());
                 dto.setPrice(d.getPrice());
                 dto.setDescription(d.getDescription());
                 designSubs.add(dto);
-
             });
             return designSubs;
         }
         return new ArrayList<>();
     }
 
-    public void delete(UUID id){
-
-        Optional<Subscription>subscription=subscriptionRepository.findById(id);
-
+    public void delete(UUID id) {
+        Optional<Subscription> subscription = subscriptionRepository.findById(id);
         subscription.ifPresent(subscriptionRepository::delete);
 
     }
-
-
-
-
-
-
 
 
 }

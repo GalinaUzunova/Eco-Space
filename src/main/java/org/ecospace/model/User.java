@@ -6,47 +6,35 @@ import jakarta.validation.constraints.Email;
 import lombok.*;
 
 
-
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-
 @Getter
 @Setter
-
-
 @Entity
 @Table(name = "users")
-
-public class User  extends BaseEntity {
+public class User extends BaseEntity {
     @Column(nullable = false)
     private String username;
     @Email
     @Column(nullable = false)
     String email;
-
     @Column(nullable = false)
     private String password;
-
     @Enumerated(EnumType.STRING)
     private UserRole role;
-
+    private String phone;
     private LocalDateTime createdOn;
-
     private String image;
-
-
     private boolean active;
     private boolean isNotified;
-
-
     @OneToMany
-    private List<Subscription>subscriptions;
+    private List<Subscription> subscriptions;
     @OneToMany(fetch = FetchType.EAGER)
-    private List<Product>productList;
+    private List<Product> productList;
 
 }
 

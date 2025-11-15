@@ -1,6 +1,5 @@
 package org.ecospace.web.controler;
 
-
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.ecospace.model.Product;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
@@ -25,13 +23,9 @@ import java.util.UUID;
 @Slf4j
 @Controller
 public class UserController {
-
-
     private final UserServiceImpl userService;
     private final SubscriptionServiceImpl subscriptionService;
-
     private final ProductServiceImpl productService;
-
 
     @ModelAttribute("subscriptionDto")
     private SubscriptionDtos get() {
@@ -65,12 +59,11 @@ public class UserController {
         return "register";
     }
 
-
     @PostMapping("/register")
-    public String doRegister(@Valid UserDto userDto, BindingResult bindingResult, RedirectAttributes redirectAttributes
+    public String doRegister(@Valid UserDto userDto, BindingResult bindingResult,
+                             RedirectAttributes redirectAttributes
     ) {
-
-        if (bindingResult.hasErrors() ||userService.userExists(userDto)) {
+        if (bindingResult.hasErrors() || userService.userExists(userDto)) {
             redirectAttributes.addFlashAttribute("userDto", userDto);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.userDto", bindingResult);
             bindingResult.rejectValue("username", "Error", "Username already exist");
@@ -85,42 +78,30 @@ public class UserController {
             userService.userRegister(userDto);
             return "login";
         }
-
-
     }
 
-
     @GetMapping("/login")
-
     public String viewLogin(@RequestParam(value = "error", required = false) String errorParam, Model model) {
         if (errorParam != null) {
             model.addAttribute("errorMessage", "Username or password is incorrect!");
-
         }
         return "login";
     }
 
-
     @GetMapping("/client")
-
-    public String viewClient(@AuthenticationPrincipal AuthenticationMetadata authenticationPriciple, Model model) {
-
-        User user = userService.byId(authenticationPriciple.getId());
-
-        List<Product> clientSubs = this.userService.getClentSubs(authenticationPriciple.getId());
+    public String viewClient(@AuthenticationPrincipal AuthenticationMetadata authenticationPrinciple, Model model) {
+        User user = userService.byId(authenticationPrinciple.getId());
+        List<Product> clientSubs = this.userService.getClientSubs(authenticationPrinciple.getId());
         model.addAttribute("clientSubs", clientSubs);
         model.addAttribute("user", user);
         model.addAttribute("currentPage", "client");
-
         if (!model.containsAttribute("subscriptionDto")) {
             model.addAttribute("subscriptionDto", new SubscriptionDtos());
         }
         return "client";
     }
 
-
     @PostMapping("/client")
-
     public String getClient(@Valid SubscriptionDtos subscriptionDto, BindingResult bindingResult
             , RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
@@ -133,22 +114,16 @@ public class UserController {
 
     }
 
-
     @GetMapping("/payment/{id}")
-
     public String getPayment(@PathVariable("id") UUID id, Model model) {
-
         Subscription subscriptionUser = subscriptionService.byId(id);
         model.addAttribute("subscriptionUser", subscriptionUser);
 
         return "payment";
     }
 
-
     @PostMapping("/payment/{id}")
-
     public String doPayment(@PathVariable("id") UUID id, @Valid UserCardDto cardDto, BindingResult bindingResult, RedirectAttributes redirectAttributes, @AuthenticationPrincipal AuthenticationMetadata authenticationPriciple) {
-
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("cardDto", cardDto);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.cardDto", bindingResult);
@@ -158,9 +133,7 @@ public class UserController {
         return "successes";
     }
 
-
     @PostMapping("/renew/{id}")
-
     private String renewProduct(@PathVariable("id") UUID id, @Valid UserCardDto cardDto, BindingResult bindingResult, RedirectAttributes redirectAttributes, @AuthenticationPrincipal AuthenticationMetadata authenticationPriciple) {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("cardDto", cardDto);
@@ -171,7 +144,6 @@ public class UserController {
         return "successes";
 
     }
-
 
     @GetMapping("/renew/{id}")
     private String getRenewPage(@PathVariable UUID id, Model model) {
@@ -192,7 +164,6 @@ public class UserController {
 
     @PutMapping("/edit-profile/update/{id}")
     public String editProfile(@PathVariable("id") UUID id, @AuthenticationPrincipal AuthenticationMetadata authenticationMetadata, @Valid ProfileDto editProfile, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
-
         if (bindingResult.hasErrors()) {
             User user = userService.byId(id);
             redirectAttributes.addFlashAttribute("user", user);
@@ -200,7 +171,6 @@ public class UserController {
 
             return "redirect:/edit-profile";
         }
-
         this.userService.editProfile(editProfile, id, authenticationMetadata);
         String role = authenticationMetadata.getRole().toString();
         if (role.equals("ADMIN")) {

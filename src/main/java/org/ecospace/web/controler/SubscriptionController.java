@@ -11,7 +11,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
@@ -54,7 +53,6 @@ public class SubscriptionController {
         return "design";
     }
 
-
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/add-subscription")
     public String viewpage() {
@@ -74,12 +72,8 @@ public class SubscriptionController {
             return "redirect:/add-subscription";
         }
         subscriptionService.addNewSubscription(subDto);
-            return "redirect:/manager";
-        }
-
-
-
-
+        return "redirect:/manager";
+    }
 
     @GetMapping("/maintenance")
     public String viewMaintenance(Model model) {
@@ -90,17 +84,14 @@ public class SubscriptionController {
         return "maintenance";
     }
 
-
     @GetMapping("/edit-subscription/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public String viewEditForm(@PathVariable("id") UUID id, Model model) {
-
 
         Subscription subscription = subscriptionService.byId(id);
         EditSubDto editedDto = DtoMapper.fromSubscription(subscription);
         model.addAttribute("editedDto", editedDto);
         model.addAttribute("subscription", subscription);
-
 
         return "/edit-subscription";
     }
@@ -118,7 +109,6 @@ public class SubscriptionController {
 
             return "/edit-subscription";
         }
-
         this.subscriptionService.editSubscription(id, editedDto);
         if (editedDto.getType().name().equals("DESIGN")) {
             return "redirect:/design";
