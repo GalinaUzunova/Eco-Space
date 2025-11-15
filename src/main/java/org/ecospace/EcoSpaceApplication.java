@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableAsync
 @EnableScheduling
-@EnableFeignClients
+@EnableFeignClients(basePackages = "org.ecospace.notification.client")
 @SpringBootApplication
 public class EcoSpaceApplication {
 

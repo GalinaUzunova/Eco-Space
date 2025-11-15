@@ -2,7 +2,7 @@ package org.ecospace.notification.service;
 
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
-import org.ecospace.notification.client.MessageServiseClient;
+import org.ecospace.notification.client.MessageServiceClient;
 import org.ecospace.notification.client.dto.ContactFormDto;
 import org.ecospace.notification.client.dto.ContactRequest;
 import org.ecospace.notification.client.dto.ContactResponse;
@@ -11,10 +11,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class MessageService {
 
-    private final MessageServiseClient messageServiseClient;
+    private final MessageServiceClient messageServiceClient;
 
-    public MessageService(MessageServiseClient messageServiseClient) {
-        this.messageServiseClient = messageServiseClient;
+    public MessageService(MessageServiceClient messageServiceClient) {
+        this.messageServiceClient = messageServiceClient;
     }
 
     public boolean sendContactForm(ContactFormDto contactFormDto) {
@@ -29,7 +29,7 @@ public class MessageService {
                     .subject("Contact-Form")
                     .build();
           log.info("🔄 Calling Message Microservice...");
-            ContactResponse response = messageServiseClient.submitContactForm(contactRequest).getBody();
+            ContactResponse response = messageServiceClient.submitContactForm(contactRequest).getBody();
 
 
             log.info("✅ Message processed successfully! ID: " + response.getId());
