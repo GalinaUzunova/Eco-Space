@@ -10,19 +10,12 @@ import java.util.UUID;
 @Getter@Setter
 @AllArgsConstructor
 
-
 public class SubscriptionRenewEvent {
 
-
     private UUID userId;
-
     private String username;
-
     private String email;
-
     private String subscriptionName;
-
     private Double price;
-
     private LocalDateTime expiredOn;
 }

@@ -38,12 +38,12 @@ spring:
 server:
   port: 8084
 
-feign:
-  client:
-    config:
-      default:
-        connectTimeout: 5000
-        readTimeout: 15000
+#feign:
+#  client:
+#    config:
+#      default:
+#        connectTimeout: 5000
+#        readTimeout: 15000
 
 logging:
   level:
@@ -55,11 +55,11 @@ logging:
 
 
 
-#  Custom Application Properties
-app:
-  email:
-    from: your-email@gmail.com
-    company-name: "Eco-Space"
-  subscription:
-    expiry-notification-days: 7
-    cron-expression: "0 0 9 * * ?"
+##  Custom Application Properties
+#app:
+#  email:
+#    from: your-email@gmail.com
+#    company-name: "Eco-Space"
+#  subscription:
+#    expiry-notification-days: 7
+#    cron-expression: "0 0 9 * * ?"

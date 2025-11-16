@@ -18,14 +18,13 @@ import java.util.UUID;
 @Getter
 @Setter
 public class ProfileDto {
-
     private UUID id;
     @Size(min = 6, max = 20, message = "Username must be between 6 and 20 characters!")
     private String username;
     @Email
     private String email;
-
     @URL
     private String imageURL;
+    private String phone;
 
 }

@@ -89,6 +89,10 @@ public class UserServiceImpl implements UserDetailsService {
         product.setActive(true);
         product.setCreatedOn(LocalDateTime.now());
         product.setExpired(createSubscriptionPeriod(product.getNamePackage()));
+        this.productRepository.save(product);
+        user.get().setNotified(false);
+
+        userRepository.save(user.get());
 
     }
 
@@ -111,7 +115,6 @@ public class UserServiceImpl implements UserDetailsService {
         product.setType(subscription.getType());
         product.setExpired(createSubscriptionPeriod(subscription.getNamePackage()));
         product.setActive(true);
-
         this.productRepository.save(product);
 
         List<Product> productList = new ArrayList<>(userRepository.findUserSubs(userId));
@@ -165,6 +168,7 @@ public class UserServiceImpl implements UserDetailsService {
         }
         user.setEmail(profileDto.getEmail());
         user.setUsername(profileDto.getUsername());
+        user.setPhone(profileDto.getPhone());
         this.userRepository.save(user);
 
     }
