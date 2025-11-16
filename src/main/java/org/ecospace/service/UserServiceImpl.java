@@ -11,6 +11,8 @@ import org.ecospace.repository.ProductRepository;
 import org.ecospace.repository.UserRepository;
 import org.ecospace.security.AuthenticationMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -44,6 +46,7 @@ public class UserServiceImpl implements UserDetailsService {
     }
 
     @Transactional
+    @CacheEvict(value = "users", allEntries = true)
     public void userRegister(UserDto userDto) {
         User user = new User();
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
@@ -59,6 +62,7 @@ public class UserServiceImpl implements UserDetailsService {
         userRepository.save(user);
     }
 
+    @Cacheable(value = "users", unless = "#result == null")
     public User byId(UUID id) {
         Optional<User> userById = this.userRepository.findById(id);
         if (userById.isEmpty()) {
@@ -67,12 +71,13 @@ public class UserServiceImpl implements UserDetailsService {
         return userById.get();
     }
 
-
+    @Cacheable("products")
     public List<Product> getClientSubs(UUID id) {
         return this.userRepository.findUserSubs(id);
     }
 
     @Transactional
+    @CacheEvict(value = "products", allEntries = true)
     public void renew(@AuthenticationPrincipal AuthenticationMetadata authenticationPriciple, UserCardDto cardDto, UUID id) {
 
         Optional<User> user = userRepository.findById(authenticationPriciple.getId());
@@ -97,6 +102,7 @@ public class UserServiceImpl implements UserDetailsService {
     }
 
     @Transactional
+    @CacheEvict(value = "products", allEntries = true)
     public void buyProduct(@AuthenticationPrincipal AuthenticationMetadata authenticationPriciple, UserCardDto cardDto, UUID id) {
 
         UUID userId = authenticationPriciple.getId();
@@ -138,7 +144,7 @@ public class UserServiceImpl implements UserDetailsService {
         return expiresOn;
     }
 
-
+    @Cacheable("users")
     public List<User> getAllUsersAndSubs() {
         if (this.userRepository.findAllByAndProductList() != null) {
             return this.userRepository.findAllByAndProductList();
@@ -146,12 +152,13 @@ public class UserServiceImpl implements UserDetailsService {
         return new ArrayList<>();
     }
 
-
+    @Cacheable("users")
     public List<User> getAllUsers() {
         List<User> allUsers = this.userRepository.getAllBy();
         return Objects.requireNonNullElseGet(allUsers, ArrayList::new);
     }
 
+    @CacheEvict(value = "users", allEntries = true)
     public void editProfile(ProfileDto profileDto, UUID id, @AuthenticationPrincipal AuthenticationMetadata authenticationPrinciple) {
         if (!id.equals(authenticationPrinciple.getId())) {
             throw new RuntimeException("Not authorized operation");
@@ -187,7 +194,7 @@ public class UserServiceImpl implements UserDetailsService {
         throw new RuntimeException("User not exsist");
     }
 
-
+    @CacheEvict(value = "users",allEntries = true)
     public void changeRole(UUID id) {
         User user = this.userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));

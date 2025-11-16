@@ -7,9 +7,9 @@ import org.ecospace.model.User;
 import org.ecospace.notification.client.MessageServiceClient;
 import org.ecospace.notification.client.dto.SubscriptionRemainderRequest;
 import org.ecospace.repository.ProductRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -20,10 +20,12 @@ import java.util.UUID;
 public class ProductServiceImpl {
     private final ProductRepository productRepository;
     private MessageServiceClient client;
+
     public ProductServiceImpl(ProductRepository productRepository) {
         this.productRepository = productRepository;
 
     }
+     @Cacheable("products")
     public Product findById(UUID id) {
         Optional<Product> findById = this.productRepository.findById(id);
         if (findById.isEmpty()) {

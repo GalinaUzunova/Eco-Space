@@ -1,10 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head th:replace="~{fragments/commons::head}">
-<!--    <meta charset="UTF-8">-->
-<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
-<!--    <title>Add Subscription Plan</title>-->
-<!--    <link rel="stylesheet" href="subscription-form.css">-->
+
 </head>
 <body>
 <div id="main-container">
@@ -12,11 +9,6 @@
         <h1 id="main-title">Manager Portal</h1>
         <h2 id="page-title">Add New Subscription Plan</h2>
         <nav id="nav-container" th:replace="~{fragments/admin::nav}">
-
-<!--            <a th:href="@{home}" class="nav-button">Home</a>-->
-<!--            <a th:href="@{manager}" class="nav-button">Manager</a>-->
-<!--            <a th:href="@{logout}" class="nav-button">Logout</a>-->
-
 
 
         </nav>
@@ -114,7 +106,7 @@
 
                     <div class="form-actions">
                          <button type="submit" class="form-submit" >Create Subscription Plan</button>
-                        <button type="button" id="cancel-btn" class="cancel-button">Cancel</button>
+                        <a type="button" id="cancel-btn" class="cancel-button" th:href="@{/manager}">Cancel</a>
                     </div>
                 </form>
             </div>

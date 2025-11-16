@@ -5,9 +5,10 @@ import org.ecospace.model.Subscription;
 import org.ecospace.model.SubscriptionType;
 import org.ecospace.model.dto.*;
 import org.ecospace.repository.SubscriptionRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +23,7 @@ public class SubscriptionServiceImpl {
     }
 
     @Transactional
+    @CacheEvict(value = "subscription", allEntries = true)
     public void addNewSubscription(AddSubDto subDto) {
         Subscription subscription =
                 Subscription.builder()
@@ -34,6 +36,7 @@ public class SubscriptionServiceImpl {
         this.subscriptionRepository.save(subscription);
     }
 
+    @Cacheable("subscriptions")
     public List<MaintenanceSubDto> getMaintenanceSubscriptions() {
         List<MaintenanceSubDto> byMaintenance = new ArrayList<>();
         List<Subscription> maintenanceSubs = subscriptionRepository.getByType(SubscriptionType.MAINTANACE);
@@ -53,8 +56,8 @@ public class SubscriptionServiceImpl {
     }
 
     @Transactional
+    @CacheEvict(value = "subscriptions", allEntries = true)
     public void editSubscription(UUID id, EditSubDto edited) {
-
         Optional<Subscription> byId = this.subscriptionRepository.findById(id);
         if (byId.isPresent()) {
             Subscription subscription = byId.get();
@@ -67,6 +70,7 @@ public class SubscriptionServiceImpl {
         }
     }
 
+    @Cacheable(value = "subscriptions", unless = "#result == null")
     public Subscription byId(UUID id) {
         Optional<Subscription> byId = this.subscriptionRepository.findById(id);
         if (byId.isPresent()) {
@@ -75,6 +79,7 @@ public class SubscriptionServiceImpl {
         throw new RuntimeException("Package doesn't exist");
     }
 
+    @Cacheable("subscriptions")
     public List<DesignSubscriptionDto> getDesignSubscriptions() {
         List<DesignSubscriptionDto> designSubs = new ArrayList<>();
         List<Subscription> designList = this.subscriptionRepository.getByType(SubscriptionType.DESIGN);
@@ -92,6 +97,7 @@ public class SubscriptionServiceImpl {
         return new ArrayList<>();
     }
 
+    @CacheEvict(value = "subscriptions", allEntries = true)
     public void delete(UUID id) {
         Optional<Subscription> subscription = subscriptionRepository.findById(id);
         subscription.ifPresent(subscriptionRepository::delete);
