@@ -1,6 +1,5 @@
 package org.ecospace.service;
-
-
+import org.ecospace.exception.SubscriptionNotFoundException;
 import org.ecospace.model.Subscription;
 import org.ecospace.model.SubscriptionType;
 import org.ecospace.model.dto.*;
@@ -30,7 +29,6 @@ public class SubscriptionServiceImpl {
                         .type(subDto.getType())
                         .price(subDto.getPrice())
                         .namePackage(subDto.getNamePackage())
-
                         .description(subDto.getDescription())
                         .build();
         this.subscriptionRepository.save(subscription);
@@ -38,6 +36,7 @@ public class SubscriptionServiceImpl {
 
     @Cacheable("subscriptions")
     public List<MaintenanceSubDto> getMaintenanceSubscriptions() {
+
         List<MaintenanceSubDto> byMaintenance = new ArrayList<>();
         List<Subscription> maintenanceSubs = subscriptionRepository.getByType(SubscriptionType.MAINTANACE);
         if (!maintenanceSubs.isEmpty()) {
@@ -58,6 +57,7 @@ public class SubscriptionServiceImpl {
     @Transactional
     @CacheEvict(value = "subscriptions", allEntries = true)
     public void editSubscription(UUID id, EditSubDto edited) {
+
         Optional<Subscription> byId = this.subscriptionRepository.findById(id);
         if (byId.isPresent()) {
             Subscription subscription = byId.get();
@@ -65,18 +65,15 @@ public class SubscriptionServiceImpl {
             subscription.setNamePackage(edited.getNamePackage());
             subscription.setPrice(edited.getPrice());
             subscription.setDescription(edited.getDescription());
-
             this.subscriptionRepository.save(subscription);
         }
     }
 
     @Cacheable(value = "subscriptions", unless = "#result == null")
     public Subscription byId(UUID id) {
-        Optional<Subscription> byId = this.subscriptionRepository.findById(id);
-        if (byId.isPresent()) {
-            return byId.get();
-        }
-        throw new RuntimeException("Package doesn't exist");
+
+        return this.subscriptionRepository.findById(id)
+                .orElseThrow(() -> new SubscriptionNotFoundException(id));
     }
 
     @Cacheable("subscriptions")
@@ -100,9 +97,10 @@ public class SubscriptionServiceImpl {
     @CacheEvict(value = "subscriptions", allEntries = true)
     public void delete(UUID id) {
         Optional<Subscription> subscription = subscriptionRepository.findById(id);
+        if (subscription.isEmpty()) {
+            throw new SubscriptionNotFoundException(id);
+        }
         subscription.ifPresent(subscriptionRepository::delete);
-
     }
-
 
 }

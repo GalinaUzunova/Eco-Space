@@ -2,6 +2,7 @@ package org.ecospace.service;
 
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.ecospace.exception.ProductNotFound;
 import org.ecospace.model.Product;
 import org.ecospace.model.User;
 import org.ecospace.notification.client.MessageServiceClient;
@@ -19,17 +20,19 @@ import java.util.UUID;
 @Slf4j
 public class ProductServiceImpl {
     private final ProductRepository productRepository;
-    private MessageServiceClient client;
+    private final MessageServiceClient client;
 
-    public ProductServiceImpl(ProductRepository productRepository) {
+    public ProductServiceImpl(ProductRepository productRepository, MessageServiceClient client) {
         this.productRepository = productRepository;
-
+        this.client = client;
     }
-     @Cacheable("products")
+
+    @Cacheable("products")
     public Product findById(UUID id) {
+
         Optional<Product> findById = this.productRepository.findById(id);
         if (findById.isEmpty()) {
-            throw new RuntimeException("Product dost exist!");
+            throw new ProductNotFound("Product doesn't exist!");
         }
         return findById.get();
     }
@@ -37,6 +40,7 @@ public class ProductServiceImpl {
     @Scheduled(cron = "0 0 11 * * ?")
     @Transactional
     public void checkForExpired() {
+
         LocalDateTime warningDate = LocalDateTime.now().plusDays(7);
         LocalDateTime today = LocalDateTime.now();
         List<Product> allForRenew = productRepository.findAllByExpiredBetween(today, warningDate);
@@ -49,15 +53,13 @@ public class ProductServiceImpl {
                             .username(user.getUsername())
                             .expiredOn(product.getExpired())
                             .subsName(product.getNamePackage()).build();
-
                     client.sendSubscriptionReminder(request);
-
                     product.setRenewalNotify(true);
                     productRepository.save(product);
-
                 }
             });
         } else {
+
             log.info("No expired subscriptions");
         }
     }

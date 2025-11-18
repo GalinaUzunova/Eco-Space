@@ -1,5 +1,8 @@
 package org.ecospace.service;
 
+import org.ecospace.exception.AccesDeniedException;
+import org.ecospace.exception.ProductNotFound;
+import org.ecospace.exception.UserNotFoundException;
 import org.ecospace.model.Product;
 import org.ecospace.model.Subscription;
 import org.ecospace.model.User;
@@ -20,6 +23,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
@@ -41,6 +45,7 @@ public class UserServiceImpl implements UserDetailsService {
     }
 
     public boolean userExists(UserDto userDto) {
+
         return userRepository.findByUsername(userDto.getUsername())
                 .isPresent();
     }
@@ -48,6 +53,7 @@ public class UserServiceImpl implements UserDetailsService {
     @Transactional
     @CacheEvict(value = "users", allEntries = true)
     public void userRegister(UserDto userDto) {
+
         User user = new User();
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         user.setUsername(userDto.getUsername());
@@ -64,51 +70,58 @@ public class UserServiceImpl implements UserDetailsService {
 
     @Cacheable(value = "users", unless = "#result == null")
     public User byId(UUID id) {
+
         Optional<User> userById = this.userRepository.findById(id);
         if (userById.isEmpty()) {
-            throw new RuntimeException("Not exist");
+            throw new UserNotFoundException("User with id:" + id + " not exist");
         }
         return userById.get();
     }
 
     @Cacheable("products")
     public List<Product> getClientSubs(UUID id) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isEmpty()) {
+            throw new UserNotFoundException("User not exist!");
+        }
+        if (userRepository.findUserSubs(id).isEmpty()) {
+            return new ArrayList<>();
+        }
         return this.userRepository.findUserSubs(id);
     }
 
     @Transactional
     @CacheEvict(value = "products", allEntries = true)
-    public void renew(@AuthenticationPrincipal AuthenticationMetadata authenticationPriciple, UserCardDto cardDto, UUID id) {
+    public void renew(@AuthenticationPrincipal AuthenticationMetadata authenticationMetadata, UserCardDto cardDto, UUID id) {
 
-        Optional<User> user = userRepository.findById(authenticationPriciple.getId());
+        Optional<User> user = userRepository.findById(authenticationMetadata.getId());
         if (user.isEmpty()) {
-            throw new RuntimeException("User doesn't exist");
+            throw new UserNotFoundException("User doesn't exist");
 
         }
-        Product product = this.userRepository.findUserSubs(authenticationPriciple.getId())
+        Product product = this.userRepository.findUserSubs(authenticationMetadata.getId())
                 .stream().filter(p -> p.getId().equals(id)).findFirst().orElse(null);
         if (product == null) {
-            throw new RuntimeException("Product dost exist!");
-        }
+            throw new ProductNotFound("Product docent exist");
 
+        }
         product.setActive(true);
         product.setCreatedOn(LocalDateTime.now());
         product.setExpired(createSubscriptionPeriod(product.getNamePackage()));
         this.productRepository.save(product);
         user.get().setNotified(false);
-
         userRepository.save(user.get());
 
     }
 
     @Transactional
     @CacheEvict(value = "products", allEntries = true)
-    public void buyProduct(@AuthenticationPrincipal AuthenticationMetadata authenticationPriciple, UserCardDto cardDto, UUID id) {
+    public void buyProduct(@AuthenticationPrincipal AuthenticationMetadata authenticationMetadata, UserCardDto cardDto, UUID id) {
 
-        UUID userId = authenticationPriciple.getId();
+        UUID userId = authenticationMetadata.getId();
         Optional<User> byId = userRepository.findById(userId);
         if (byId.isEmpty()) {
-            throw new RuntimeException("User dost exist!");
+            throw new UserNotFoundException("User doesn't exist!");
         }
 
         User user = byId.get();
@@ -122,7 +135,6 @@ public class UserServiceImpl implements UserDetailsService {
         product.setExpired(createSubscriptionPeriod(subscription.getNamePackage()));
         product.setActive(true);
         this.productRepository.save(product);
-
         List<Product> productList = new ArrayList<>(userRepository.findUserSubs(userId));
         productList.add(product);
         user.setProductList(productList);
@@ -130,7 +142,7 @@ public class UserServiceImpl implements UserDetailsService {
 
     }
 
-    public LocalDateTime createSubscriptionPeriod(String packageName) {
+    private static LocalDateTime createSubscriptionPeriod(String packageName) {
         LocalDateTime expiresOn = LocalDateTime.now();
         if (packageName.contains("Monthly")) {
             expiresOn = LocalDateTime.now().plusMonths(1);
@@ -160,15 +172,10 @@ public class UserServiceImpl implements UserDetailsService {
 
     @CacheEvict(value = "users", allEntries = true)
     public void editProfile(ProfileDto profileDto, UUID id, @AuthenticationPrincipal AuthenticationMetadata authenticationPrinciple) {
-        if (!id.equals(authenticationPrinciple.getId())) {
-            throw new RuntimeException("Not authorized operation");
-        }
-        UUID userId = authenticationPrinciple.getId();
-        Optional<User> byId = userRepository.findById(userId);
-        if (byId.isEmpty()) {
-            throw new RuntimeException("Not authorized entering");
-        }
-        User user = byId.get();
+
+        User user = userRepository.findById(authenticationPrinciple.getId())
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
         if (profileDto.getImageURL() != null && !profileDto.getImageURL().isEmpty()) {
             user.setImage(profileDto.getImageURL());
 
@@ -182,22 +189,25 @@ public class UserServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
         User user = this.userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User doesn't exist"));
         return new AuthenticationMetadata(user.getUsername(), user.getPassword(), user.getId(), user.getRole(), user.isActive());
     }
 
     public User getAdmin(@AuthenticationPrincipal AuthenticationMetadata principal) {
+
         Optional<User> user = this.userRepository.findById(principal.getId());
         if (user.isPresent()) {
             return user.get();
         }
-        throw new RuntimeException("User not exsist");
+        throw new AccesDeniedException("Not Authorized operation");
     }
 
-    @CacheEvict(value = "users",allEntries = true)
+    @CacheEvict(value = "users", allEntries = true)
     public void changeRole(UUID id) {
+
         User user = this.userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
 
         if (user.getRole() == UserRole.CLIENT) {
             user.setRole(UserRole.ADMIN);

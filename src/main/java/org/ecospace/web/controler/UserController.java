@@ -10,15 +10,17 @@ import org.ecospace.security.AuthenticationMetadata;
 import org.ecospace.service.ProductServiceImpl;
 import org.ecospace.service.SubscriptionServiceImpl;
 import org.ecospace.service.UserServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import java.util.List;
 import java.util.UUID;
+
 
 @Slf4j
 @Controller
@@ -47,7 +49,7 @@ public class UserController {
         return new ProfileDto();
     }
 
-
+ @Autowired
     public UserController(UserServiceImpl userService, SubscriptionServiceImpl subscriptionService, ProductServiceImpl productService) {
         this.userService = userService;
         this.subscriptionService = subscriptionService;
@@ -60,25 +62,31 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public String doRegister(@Valid UserDto userDto, BindingResult bindingResult,
-                             RedirectAttributes redirectAttributes
-    ) {
-        if (bindingResult.hasErrors() || userService.userExists(userDto)) {
-            redirectAttributes.addFlashAttribute("userDto", userDto);
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.userDto", bindingResult);
-            bindingResult.rejectValue("username", "Error", "Username already exist");
-            return "redirect:/register";
 
-        } else if (!userDto.getPassword().equals(userDto.getConfirmPassword())) {
-            bindingResult.rejectValue("confirmPassword", "Error", "Password don't match ");
+    public String doRegister(@Valid @ModelAttribute("userDto") UserDto userDto,
+                             BindingResult bindingResult) {
 
+
+        if (bindingResult.hasErrors()) {
             return "register";
-
-        } else {
-            userService.userRegister(userDto);
-            return "login";
         }
+
+        if (userService.userExists(userDto)) {
+            bindingResult.rejectValue("username", "error.userDto", "Username already exists");
+            return "register";
+        }
+
+
+        if (!userDto.getPassword().equals(userDto.getConfirmPassword())) {
+            bindingResult.rejectValue("confirmPassword", "error.userDto", "Passwords do not match");
+            return "register";
+        }
+
+
+        userService.userRegister(userDto);
+        return "redirect:/login?success";
     }
+
 
     @GetMapping("/login")
     public String viewLogin(@RequestParam(value = "error", required = false) String errorParam, Model model) {
@@ -113,7 +121,7 @@ public class UserController {
         return "redirect:/renew/" + id;
 
     }
-
+    @PreAuthorize("hasRole('CLIENT')")
     @GetMapping("/payment/{id}")
     public String getPayment(@PathVariable("id") UUID id, Model model) {
         Subscription subscriptionUser = subscriptionService.byId(id);
@@ -121,20 +129,20 @@ public class UserController {
 
         return "payment";
     }
-
+    @PreAuthorize("hasRole('CLIENT')")
     @PostMapping("/payment/{id}")
-    public String doPayment(@PathVariable("id") UUID id, @Valid UserCardDto cardDto, BindingResult bindingResult, RedirectAttributes redirectAttributes, @AuthenticationPrincipal AuthenticationMetadata authenticationPriciple) {
+    public String doPayment(@PathVariable("id") UUID id, @Valid UserCardDto cardDto, BindingResult bindingResult, RedirectAttributes redirectAttributes, @AuthenticationPrincipal AuthenticationMetadata authenticationMetadata) {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("cardDto", cardDto);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.cardDto", bindingResult);
             return "redirect:/payment/" + id;
         }
-        this.userService.buyProduct(authenticationPriciple, cardDto, id);
+        this.userService.buyProduct(authenticationMetadata, cardDto, id);
         return "successes";
     }
-
+    @PreAuthorize("hasRole('CLIENT')")
     @PostMapping("/renew/{id}")
-    private String renewProduct(@PathVariable("id") UUID id, @Valid UserCardDto cardDto, BindingResult bindingResult, RedirectAttributes redirectAttributes, @AuthenticationPrincipal AuthenticationMetadata authenticationPriciple) {
+    public String renewProduct(@PathVariable("id") UUID id, @Valid UserCardDto cardDto, BindingResult bindingResult, RedirectAttributes redirectAttributes, @AuthenticationPrincipal AuthenticationMetadata authenticationPriciple) {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("cardDto", cardDto);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.cardDto", bindingResult);
@@ -144,16 +152,16 @@ public class UserController {
         return "successes";
 
     }
-
+    @PreAuthorize("hasRole('CLIENT')")
     @GetMapping("/renew/{id}")
-    private String getRenewPage(@PathVariable UUID id, Model model) {
+    public String getRenewPage(@PathVariable UUID id, Model model) {
         Product product = productService.findById(id);
         model.addAttribute("product", product);
         return "renew";
     }
 
     @GetMapping("/edit-profile/update/{id}")
-    private String viewProfile(@PathVariable("id") UUID id, Model model) {
+    public String viewProfile(@PathVariable("id") UUID id, Model model) {
         User user = this.userService.byId(id);
         ProfileDto editProfile = ProfileDtoMapper.fromUser(user);
         model.addAttribute("user", user);
@@ -163,11 +171,11 @@ public class UserController {
     }
 
     @PutMapping("/edit-profile/update/{id}")
-    public String editProfile(@PathVariable("id") UUID id, @AuthenticationPrincipal AuthenticationMetadata authenticationMetadata, @Valid ProfileDto editProfile, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+    public String editProfile(@PathVariable("id") UUID id, @AuthenticationPrincipal AuthenticationMetadata authenticationMetadata, @Valid ProfileDto editProfile, BindingResult bindingResult, Model model)  {
         if (bindingResult.hasErrors()) {
+
             User user = userService.byId(id);
-            redirectAttributes.addFlashAttribute("user", user);
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.user", user);
+           model.addAttribute("user", user);
 
             return "redirect:/edit-profile";
         }
