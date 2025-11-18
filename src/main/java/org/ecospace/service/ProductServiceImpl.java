@@ -47,7 +47,10 @@ public class ProductServiceImpl {
         if (!allForRenew.isEmpty()) {
             allForRenew.forEach(product -> {
                 User user = product.getUser();
-                if (!user.isNotified() && user.getPhone() != null) {
+                if(user.getPhone()==null){
+                    throw new IllegalArgumentException("User dosnet have phone number");
+                }
+                if (!user.isNotified()) {
                     SubscriptionRemainderRequest request = SubscriptionRemainderRequest.builder().
                             phone(user.getPhone())
                             .username(user.getUsername())

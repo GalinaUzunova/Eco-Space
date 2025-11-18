@@ -179,7 +179,7 @@ public class UserController {
 
             return "redirect:/edit-profile";
         }
-        this.userService.editProfile(editProfile, id, authenticationMetadata);
+        this.userService.editProfile(editProfile,  authenticationMetadata);
         String role = authenticationMetadata.getRole().toString();
         if (role.equals("ADMIN")) {
             return "redirect:/manager";

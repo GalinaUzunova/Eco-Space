@@ -23,7 +23,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
@@ -96,15 +95,15 @@ public class UserServiceImpl implements UserDetailsService {
 
         Optional<User> user = userRepository.findById(authenticationMetadata.getId());
         if (user.isEmpty()) {
-            throw new UserNotFoundException("User doesn't exist");
+            throw new UserNotFoundException("Not Authorized operation");
 
         }
         Product product = this.userRepository.findUserSubs(authenticationMetadata.getId())
-                .stream().filter(p -> p.getId().equals(id)).findFirst().orElse(null);
-        if (product == null) {
-            throw new ProductNotFound("Product docent exist");
+                .stream()
+                .filter(p -> p.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new ProductNotFound("Product with id " + id + " not found"));
 
-        }
         product.setActive(true);
         product.setCreatedOn(LocalDateTime.now());
         product.setExpired(createSubscriptionPeriod(product.getNamePackage()));
@@ -121,7 +120,7 @@ public class UserServiceImpl implements UserDetailsService {
         UUID userId = authenticationMetadata.getId();
         Optional<User> byId = userRepository.findById(userId);
         if (byId.isEmpty()) {
-            throw new UserNotFoundException("User doesn't exist!");
+            throw new UserNotFoundException("Not Authorized operation");
         }
 
         User user = byId.get();
@@ -171,10 +170,10 @@ public class UserServiceImpl implements UserDetailsService {
     }
 
     @CacheEvict(value = "users", allEntries = true)
-    public void editProfile(ProfileDto profileDto, UUID id, @AuthenticationPrincipal AuthenticationMetadata authenticationPrinciple) {
+    public void editProfile(ProfileDto profileDto,  @AuthenticationPrincipal AuthenticationMetadata authenticationPrinciple) {
 
         User user = userRepository.findById(authenticationPrinciple.getId())
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+                .orElseThrow(() -> new UsernameNotFoundException("Not Authorized operation"));
 
         if (profileDto.getImageURL() != null && !profileDto.getImageURL().isEmpty()) {
             user.setImage(profileDto.getImageURL());
@@ -207,7 +206,7 @@ public class UserServiceImpl implements UserDetailsService {
     public void changeRole(UUID id) {
 
         User user = this.userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+                .orElseThrow(() -> new AccesDeniedException("Not Authorized operation"));
 
         if (user.getRole() == UserRole.CLIENT) {
             user.setRole(UserRole.ADMIN);
