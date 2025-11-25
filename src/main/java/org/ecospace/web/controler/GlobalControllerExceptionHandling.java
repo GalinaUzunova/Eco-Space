@@ -1,9 +1,6 @@
 package org.ecospace.web.controler;
 
-import org.ecospace.exception.AccesDeniedException;
-import org.ecospace.exception.ProductNotFound;
-import org.ecospace.exception.SubscriptionNotFoundException;
-import org.ecospace.exception.UserNotFoundException;
+import org.ecospace.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -42,11 +39,11 @@ public class GlobalControllerExceptionHandling {
 
         return new ModelAndView("internal-server-error");
     }
+    @ExceptionHandler(PaymentException.class)
+    public ModelAndView handlePaymentException(){
 
-    @ExceptionHandler(Exception.class)
-    public ModelAndView handleAllOthersE(Exception e) {
+        return  new ModelAndView("internal-server-error");
 
-        return new ModelAndView("internal-server-error");
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -54,6 +51,11 @@ public class GlobalControllerExceptionHandling {
     public ModelAndView handleFAilNotification(){
         return new ModelAndView("internal-server-error");
 
+    }
+    @ExceptionHandler(Exception.class)
+    public ModelAndView handleAllOthersE(Exception e) {
+
+        return new ModelAndView("internal-server-error");
     }
 
 }

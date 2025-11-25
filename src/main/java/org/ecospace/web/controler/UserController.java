@@ -18,6 +18,8 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,6 +30,7 @@ public class UserController {
     private final UserServiceImpl userService;
     private final SubscriptionServiceImpl subscriptionService;
     private final ProductServiceImpl productService;
+
 
     @ModelAttribute("subscriptionDto")
     private SubscriptionDtos get() {
@@ -54,7 +57,8 @@ public class UserController {
         this.userService = userService;
         this.subscriptionService = subscriptionService;
         this.productService = productService;
-    }
+
+ }
 
     @GetMapping("/register")
     public String viewRegister() {
@@ -121,34 +125,49 @@ public class UserController {
         return "redirect:/renew/" + id;
 
     }
+
     @PreAuthorize("hasRole('CLIENT')")
     @GetMapping("/payment/{id}")
-    public String getPayment(@PathVariable("id") UUID id, Model model) {
+    public String showPaymentPage(@PathVariable("id") UUID id, Model model) {
         Subscription subscriptionUser = subscriptionService.byId(id);
         model.addAttribute("subscriptionUser", subscriptionUser);
 
         return "payment";
     }
+
     @PreAuthorize("hasRole('CLIENT')")
     @PostMapping("/payment/{id}")
-    public String doPayment(@PathVariable("id") UUID id, @Valid UserCardDto cardDto, BindingResult bindingResult, RedirectAttributes redirectAttributes, @AuthenticationPrincipal AuthenticationMetadata authenticationMetadata) {
-        if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("cardDto", cardDto);
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.cardDto", bindingResult);
-            return "redirect:/payment/" + id;
+    public String initiatePayment(@PathVariable("id") UUID id, @AuthenticationPrincipal AuthenticationMetadata authenticationMetadata,RedirectAttributes redirectAttributes) {
+
+        try {
+            System.out.println("=== CONTROLLER: INITIATE PAYMENT ===");
+            String payFastUrl = userService.initiatePayment(authenticationMetadata, id);
+            System.out.println("Redirecting to: " + payFastUrl);
+            return "redirect:" + payFastUrl;
+
+        } catch (Exception e) {
+            System.out.println("=== CONTROLLER ERROR ===");
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("errorMessage", "Error: " + e.getMessage());
+            return "redirect:/payment/error";
         }
-        this.userService.buyProduct(authenticationMetadata, cardDto, id);
-        return "successes";
+
+
+//        String payFastUrl = userService.initiatePayment(authenticationMetadata, id);
+//
+//        return "redirect:" + payFastUrl;
     }
+
     @PreAuthorize("hasRole('CLIENT')")
     @PostMapping("/renew/{id}")
-    public String renewProduct(@PathVariable("id") UUID id, @Valid UserCardDto cardDto, BindingResult bindingResult, RedirectAttributes redirectAttributes, @AuthenticationPrincipal AuthenticationMetadata authenticationPriciple) {
+    public String renewProduct(@PathVariable("id") UUID id, @Valid UserCardDto cardDto, BindingResult bindingResult, RedirectAttributes redirectAttributes, @AuthenticationPrincipal AuthenticationMetadata metadata) {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("cardDto", cardDto);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.cardDto", bindingResult);
             return "redirect:/renew/" + id;
         }
-        this.userService.renew(authenticationPriciple, cardDto, id);
+        this.userService.renew(metadata, cardDto, id);
         return "successes";
 
     }

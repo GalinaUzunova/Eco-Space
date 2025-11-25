@@ -1,9 +1,7 @@
 package org.ecospace.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -12,6 +10,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
+@Builder
+@AllArgsConstructor
 
 public class Product extends BaseEntity{
 @Column(nullable = false)

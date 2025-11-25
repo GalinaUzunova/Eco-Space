@@ -12,15 +12,19 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserCardDto {
-    @NotBlank
-    @Pattern(regexp = "^\\d+$", message = "Field must contain only digits")
-
+    @NotBlank(message = "Card number is required")
+    @Pattern(regexp = "\\d{13,19}", message = "Card number must be 13-19digits")
     private String card;
-    @NotBlank
+
+    @NotBlank(message = "Cardholder name is required")
     private String name;
-    @NotBlank
+
+    @NotBlank(message = "Expiry date is required")
+    @Pattern(regexp = "(0[1-9]|1[0-2])/[0-9]{2}", message = "Expiry date must be in MM/YY format")
     private String expiresOn;
-    @NotBlank
+
+    @NotBlank(message = "CVV is required")
+    @Pattern(regexp = "\\d{3,4}", message = "CVV must be 3 or 4 digits")
     private String cvv;
 
 

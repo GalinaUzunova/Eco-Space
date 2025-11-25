@@ -8,6 +8,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Builder
 @NoArgsConstructor
@@ -31,6 +32,12 @@ public class User extends BaseEntity {
     private String image;
     private boolean active;
     private boolean isNotified;
+
+    @Column(name = "pending_order_id")
+    private String pendingPaymentOrderId;
+    @Column(name = "pending_sub_order_id")
+    private UUID setPendingSubscriptionId;
+
     @OneToMany
     private List<Subscription> subscriptions;
     @OneToMany(fetch = FetchType.EAGER)
