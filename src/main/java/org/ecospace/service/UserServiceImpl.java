@@ -1,6 +1,7 @@
 package org.ecospace.service;
 
 import org.ecospace.exception.AccesDeniedException;
+import org.ecospace.exception.PaymentException;
 import org.ecospace.exception.ProductNotFound;
 import org.ecospace.exception.UserNotFoundException;
 import org.ecospace.model.Product;
@@ -23,6 +24,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
@@ -34,20 +36,25 @@ public class UserServiceImpl implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final SubscriptionServiceImpl subscriptionService;
     private final ProductRepository productRepository;
+    private final PayFastService payFastService;
+
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, SubscriptionServiceImpl subscriptionService, ProductRepository productRepository) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, SubscriptionServiceImpl subscriptionService, ProductRepository productRepository, PayFastService payFastService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.subscriptionService = subscriptionService;
         this.productRepository = productRepository;
+        this.payFastService = payFastService;
     }
+
 
     public boolean userExists(UserDto userDto) {
 
         return userRepository.findByUsername(userDto.getUsername())
                 .isPresent();
     }
+
 
     @Transactional
     @CacheEvict(value = "users", allEntries = true)
@@ -67,6 +74,7 @@ public class UserServiceImpl implements UserDetailsService {
         userRepository.save(user);
     }
 
+
     @Cacheable(value = "users", unless = "#result == null")
     public User byId(UUID id) {
 
@@ -76,6 +84,7 @@ public class UserServiceImpl implements UserDetailsService {
         }
         return userById.get();
     }
+
 
     @Cacheable("products")
     public List<Product> getClientSubs(UUID id) {
@@ -88,6 +97,7 @@ public class UserServiceImpl implements UserDetailsService {
         }
         return this.userRepository.findUserSubs(id);
     }
+
 
     @Transactional
     @CacheEvict(value = "products", allEntries = true)
@@ -114,46 +124,89 @@ public class UserServiceImpl implements UserDetailsService {
     }
 
     @Transactional
-    @CacheEvict(value = "products", allEntries = true)
-    public void buyProduct(@AuthenticationPrincipal AuthenticationMetadata authenticationMetadata, UserCardDto cardDto, UUID id) {
+    public String initiatePayment(@AuthenticationPrincipal AuthenticationMetadata authenticationMetadata, UUID subscriptionId) {
 
+        System.out.println("=== INITIATE PAYMENT STARTED ===");
+        System.out.println("User ID: " + authenticationMetadata.getId());
+        System.out.println("Subscription ID: " + subscriptionId);
         UUID userId = authenticationMetadata.getId();
-        Optional<User> byId = userRepository.findById(userId);
-        if (byId.isEmpty()) {
-            throw new UserNotFoundException("Not Authorized operation");
-        }
 
-        User user = byId.get();
-        Subscription subscription = subscriptionService.byId(id);
-        Product product = new Product();
-        product.setNamePackage(subscription.getNamePackage());
-        product.setPrice(subscription.getPrice());
-        product.setDescription(subscription.getDescription());
-        product.setCreatedOn(LocalDateTime.now());
-        product.setType(subscription.getType());
-        product.setExpired(createSubscriptionPeriod(subscription.getNamePackage()));
-        product.setActive(true);
-        this.productRepository.save(product);
-        List<Product> productList = new ArrayList<>(userRepository.findUserSubs(userId));
-        productList.add(product);
-        user.setProductList(productList);
-        this.userRepository.save(user);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        Subscription subscription = subscriptionService.byId(subscriptionId);
+
+        String merchantOrderId = "ECOSpace-" + userId + "-" + subscriptionId + "-" + System.currentTimeMillis();
+        System.out.println("Merchant Order ID: " + merchantOrderId);
+
+        user.setPendingPaymentOrderId(merchantOrderId);
+        user.setSetPendingSubscriptionId(subscriptionId);
+        userRepository.save(user);
+        System.out.println("Pending payment stored in database");
+
+        try {
+            String payfastUrl = payFastService.createPayment(
+                    BigDecimal.valueOf(subscription.getPrice()),
+                    subscription.getNamePackage(),
+                    merchantOrderId, user.getEmail(), user.getUsername(), user.getPhone()
+            );
+
+            System.out.println("PayFast URL generated: " + payfastUrl);
+            System.out.println("=== INITIATE PAYMENT COMPLETED ===");
+
+            return payfastUrl;
+        } catch (Exception e) {
+            System.out.println("=== ERROR IN INITIATE PAYMENT ===");
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            throw new PaymentException("Failed to initiate payment: " + e.getMessage());
+        }
+    }
+
+
+    @Transactional
+    @CacheEvict(value = "products", allEntries = true)
+    public boolean completePayment(String merchantOrderId, Map<String, String> payFastData) {
+
+        boolean paymentVerified = payFastService.verifyPayment(payFastData);
+
+        if (!paymentVerified) {
+            System.out.println("Error: Payment verification failed " );
+            throw new PaymentException("Payment verification failed");
+        }
+        String[] orderParts = merchantOrderId.split("-");
+        if (orderParts.length < 3) {
+            System.out.println("Error: Invalid order ID format" );
+            throw new PaymentException("Invalid order ID format");
+        }
+        UUID userId = UUID.fromString(orderParts[1]);
+        UUID subscriptionId = UUID.fromString(orderParts[2]);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        Subscription subscription = subscriptionService.byId(subscriptionId);
+
+        user.setPendingPaymentOrderId(null);
+        user.setSetPendingSubscriptionId(null);
+        userRepository.save(user);
+
+        createAndAssignProduct(subscription, user);
+
+        return true;
 
     }
 
-    private static LocalDateTime createSubscriptionPeriod(String packageName) {
-        LocalDateTime expiresOn = LocalDateTime.now();
-        if (packageName.contains("Monthly")) {
-            expiresOn = LocalDateTime.now().plusMonths(1);
-        } else if (packageName.contains("Year")) {
-            expiresOn = LocalDateTime.now().plusYears(1);
-        } else if (packageName.contains("6-Month")) {
-            expiresOn = LocalDateTime.now().plusMonths(6);
-        }
-        expiresOn = expiresOn.with(LocalTime.MAX);
+    @Transactional
+    public void cancelPendingPayment(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        return expiresOn;
+        user.setPendingPaymentOrderId(null);
+        user.setSetPendingSubscriptionId(null);
+        userRepository.save(user);
     }
+
 
     @Cacheable("users")
     public List<User> getAllUsersAndSubs() {
@@ -169,8 +222,9 @@ public class UserServiceImpl implements UserDetailsService {
         return Objects.requireNonNullElseGet(allUsers, ArrayList::new);
     }
 
+
     @CacheEvict(value = "users", allEntries = true)
-    public void editProfile(ProfileDto profileDto,  @AuthenticationPrincipal AuthenticationMetadata authenticationPrinciple) {
+    public void editProfile(ProfileDto profileDto, @AuthenticationPrincipal AuthenticationMetadata authenticationPrinciple) {
 
         User user = userRepository.findById(authenticationPrinciple.getId())
                 .orElseThrow(() -> new UsernameNotFoundException("Not Authorized operation"));
@@ -215,6 +269,43 @@ public class UserServiceImpl implements UserDetailsService {
         }
 
         this.userRepository.save(user);
+    }
+
+
+    private void createAndAssignProduct(Subscription subscription, User user) {
+        Product product = createProductFromSubs(subscription);
+        this.productRepository.save(product);
+
+        List<Product> productList = new ArrayList<>(userRepository.findUserSubs(user.getId()));
+        productList.add(product);
+        user.setProductList(productList);
+        this.userRepository.save(user);
+    }
+
+    private static Product createProductFromSubs(Subscription subscription) {
+        Product product = new Product();
+        product.setNamePackage(subscription.getNamePackage());
+        product.setPrice(subscription.getPrice());
+        product.setDescription(subscription.getDescription());
+        product.setCreatedOn(LocalDateTime.now());
+        product.setType(subscription.getType());
+        product.setExpired(createSubscriptionPeriod(subscription.getNamePackage()));
+        product.setActive(true);
+        return product;
+    }
+
+    private static LocalDateTime createSubscriptionPeriod(String packageName) {
+        LocalDateTime expiresOn = LocalDateTime.now();
+        if (packageName.contains("Monthly")) {
+            expiresOn = LocalDateTime.now().plusMonths(1);
+        } else if (packageName.contains("Year")) {
+            expiresOn = LocalDateTime.now().plusYears(1);
+        } else if (packageName.contains("6-Month")) {
+            expiresOn = LocalDateTime.now().plusMonths(6);
+        }
+        expiresOn = expiresOn.with(LocalTime.MAX);
+
+        return expiresOn;
     }
 
 
