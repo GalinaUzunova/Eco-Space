@@ -55,14 +55,14 @@ public class UserController {
         return new ProfileDto();
     }
 
- @Autowired
+    @Autowired
     public UserController(UserServiceImpl userService, SubscriptionServiceImpl subscriptionService, ProductServiceImpl productService, CancelSubsUtill cancelSubsUtill) {
         this.userService = userService;
         this.subscriptionService = subscriptionService;
         this.productService = productService;
 
-     this.cancelSubsUtill = cancelSubsUtill;
- }
+        this.cancelSubsUtill = cancelSubsUtill;
+    }
 
     @GetMapping("/register")
     public String viewRegister() {
@@ -129,10 +129,11 @@ public class UserController {
         return "redirect:/renew/" + id;
 
     }
-    @PostMapping("/client/subscription/cancel")
-    public String cancelSubscription(@RequestParam UUID subscriptionId,@AuthenticationPrincipal AuthenticationMetadata user,RedirectAttributes redirectAttributes ){
 
-       this.cancelSubsUtill.cancelSubscription(user,subscriptionId,redirectAttributes);
+    @PostMapping("/client/subscription/cancel")
+    public String cancelSubscription(@RequestParam UUID subscriptionId, @AuthenticationPrincipal AuthenticationMetadata user, RedirectAttributes redirectAttributes) {
+
+        this.cancelSubsUtill.cancelSubscription(user, subscriptionId, redirectAttributes);
         return "redirect:/client";
 
     }
@@ -148,7 +149,7 @@ public class UserController {
 
     @PreAuthorize("hasRole('CLIENT')")
     @PostMapping("/payment/{id}")
-    public String initiatePayment(@PathVariable("id") UUID id, @AuthenticationPrincipal AuthenticationMetadata authenticationMetadata,RedirectAttributes redirectAttributes) {
+    public String initiatePayment(@PathVariable("id") UUID id, @AuthenticationPrincipal AuthenticationMetadata authenticationMetadata, RedirectAttributes redirectAttributes) {
 
         try {
             System.out.println("=== CONTROLLER: INITIATE PAYMENT ===");
@@ -164,8 +165,6 @@ public class UserController {
             return "redirect:/payment/error";
         }
 
-
-
     }
 
     @PreAuthorize("hasRole('CLIENT')")
@@ -180,6 +179,7 @@ public class UserController {
         return "successes";
 
     }
+
     @PreAuthorize("hasRole('CLIENT')")
     @GetMapping("/renew/{id}")
     public String getRenewPage(@PathVariable UUID id, Model model) {
@@ -199,15 +199,15 @@ public class UserController {
     }
 
     @PutMapping("/edit-profile/update/{id}")
-    public String editProfile(@PathVariable("id") UUID id, @AuthenticationPrincipal AuthenticationMetadata authenticationMetadata, @Valid ProfileDto editProfile, BindingResult bindingResult, Model model)  {
+    public String editProfile(@PathVariable("id") UUID id, @AuthenticationPrincipal AuthenticationMetadata authenticationMetadata, @Valid ProfileDto editProfile, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
 
             User user = userService.byId(id);
-           model.addAttribute("user", user);
+            model.addAttribute("user", user);
 
             return "redirect:/edit-profile";
         }
-        this.userService.editProfile(editProfile,  authenticationMetadata);
+        this.userService.editProfile(editProfile, authenticationMetadata);
         String role = authenticationMetadata.getRole().toString();
         if (role.equals("ADMIN")) {
             return "redirect:/manager";
