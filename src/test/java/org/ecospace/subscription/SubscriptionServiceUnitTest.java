@@ -34,7 +34,7 @@ public class SubscriptionServiceUnitTest {
     private SubscriptionServiceImpl subscriptionService;
 
     @Test
-    void addNewSubscription_whenAllParametersAreIn_andSaveItToTheDb() throws ValidationException {
+    void addNewSubscription_whenAllParametersAreIn_andSaveItToTheDb()  {
         AddSubDto dto = AddSubDto.builder()
                 .type(SubscriptionType.MAINTANACE)
                 .price(1500.00)

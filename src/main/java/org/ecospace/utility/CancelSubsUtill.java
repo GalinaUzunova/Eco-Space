@@ -1,14 +1,9 @@
 package org.ecospace.utility;
-
-
-import lombok.experimental.UtilityClass;
 import org.ecospace.security.AuthenticationMetadata;
-import org.ecospace.service.SubscriptionServiceImpl;
 import org.ecospace.service.UserServiceImpl;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import java.util.UUID;
 @Component
 public class CancelSubsUtill {
