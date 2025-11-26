@@ -22,8 +22,9 @@ public class SubscriptionServiceImpl {
     }
 
     @Transactional
-    @CacheEvict(value = "subscription", allEntries = true)
-    public void addNewSubscription(AddSubDto subDto) {
+    @CacheEvict(value = "subscriptions", allEntries = true)
+    public void addNewSubscription(AddSubDto subDto)  {
+
         Subscription subscription =
                 Subscription.builder()
                         .type(subDto.getType())

@@ -13,6 +13,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.xml.bind.ValidationException;
 import java.util.List;
 import java.util.UUID;
 
@@ -56,20 +57,22 @@ public class SubscriptionController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/add-subscription")
     public String viewpage() {
+
         return "add-subscription";
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/add-subscription")
 
-    public String createSub(@Valid AddSubDto subDto, BindingResult bindingResult, RedirectAttributes
-            redirectAttributes) {
+    public String createSub(@Valid AddSubDto subDto, BindingResult bindingResult,RedirectAttributes redirectAttributes
+           )  {
 
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("subDto", subDto);
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.subDto",
-                    bindingResult);
-            return "redirect:/add-subscription";
+            redirectAttributes.addFlashAttribute("subDto",subDto);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.subDto",bindingResult);
+
+            return "redirect:add-subscription";
+
         }
         subscriptionService.addNewSubscription(subDto);
         return "redirect:/manager";

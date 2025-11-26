@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.xml.bind.ValidationException;
+
 @ControllerAdvice
 public class GlobalControllerExceptionHandling {
 
@@ -43,6 +45,9 @@ public class GlobalControllerExceptionHandling {
     public ModelAndView handlePaymentException(){
 
         return  new ModelAndView("internal-server-error");
+
+
+
 
     }
 

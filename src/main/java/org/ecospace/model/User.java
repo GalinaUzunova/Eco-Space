@@ -40,7 +40,7 @@ public class User extends BaseEntity {
 
     @OneToMany
     private List<Subscription> subscriptions;
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER )
     private List<Product> productList;
 
 }

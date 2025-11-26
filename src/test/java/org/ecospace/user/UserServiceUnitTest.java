@@ -17,15 +17,13 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import static org.junit.jupiter.api.Assertions.*;
-
 import static org.mockito.Mockito.*;
 
 
@@ -43,7 +41,6 @@ public class UserServiceUnitTest {
     private PayFastService payFastService;
     @Mock
     private AuthenticationMetadata authenticationMetadata;
-
 
 
     @InjectMocks
@@ -98,7 +95,6 @@ public class UserServiceUnitTest {
                 .build();
 
 
-
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(userRepository.findUserSubs(userId)).thenReturn(expectedSubscriptions);
 
@@ -112,38 +108,56 @@ public class UserServiceUnitTest {
     }
 
     @Test
-    void getClientSubscriptions_whenClientNotExsist(){
+    void getClientSubscriptions_whenClientNotExsist() {
         UUID userId = UUID.randomUUID();
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        assertThrows(UserNotFoundException.class, ()->userService.getClientSubs(userId));
+        assertThrows(UserNotFoundException.class, () -> userService.getClientSubs(userId));
 
 
     }
-    @Test
-    void userEditProfile_whenUserIsAuthenticated_andUserImgIsNotNullOrEmpty(){
 
-        UUID userId=UUID.randomUUID();
-        ProfileDto dto=new ProfileDto(userId,"Nik",
+    @Test
+    void userEditProfile_whenUserIsAuthenticated_andUserImgIsNotNullOrEmpty_thenUpdateProfile() {
+
+        UUID userId = UUID.randomUUID();
+        ProfileDto dto = new ProfileDto(userId, "Nik",
                 "nik@abv",
                 "www.unsplash",
                 "0845222");
-        User userRetrieveFromDb =User.builder()
+        User userRetrieveFromDb = User.builder()
                 .email("zak@bg")
                 .username("Niko")
-        .build();
+                .build();
         when(authenticationMetadata.getId()).thenReturn(userId);
         when(userRepository.findById(userId)).thenReturn(Optional.of(userRetrieveFromDb));
 
-
         userService.editProfile(dto, authenticationMetadata);
-        
 
         assertEquals("Nik", userRetrieveFromDb.getUsername());
         assertEquals("nik@abv", userRetrieveFromDb.getEmail());
         assertEquals("www.unsplash", userRetrieveFromDb.getImage());
-       assertEquals("0845222", userRetrieveFromDb.getPhone());
+        assertEquals("0845222", userRetrieveFromDb.getPhone());
         verify(userRepository).save(any(User.class));
+    }
+
+
+    @Test
+    void editUserProfile_whenUserIdNotFound_thenThrowException(){
+
+        UUID userId=UUID.randomUUID();
+        ProfileDto dto = new ProfileDto(userId, "Nik",
+                "nik@abv",
+                "www.unsplash",
+                "0845222");
+
+        when(authenticationMetadata.getId()).thenReturn(userId);
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        assertThrows(UsernameNotFoundException.class,()-> userService.editProfile(dto,authenticationMetadata));
+
+        verify(userRepository).findById(userId);
+        verify(userRepository, never()).save(any(User.class));
     }
 
 

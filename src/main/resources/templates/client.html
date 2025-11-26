@@ -49,12 +49,40 @@
 
                     </select>
 
-                    <div class="subscription-actions">
+                   <div class="subscription-actions">
                         <button type="submit" id="renew-button" class="action-button renew-button">
                             Renew Subscription
                         </button>
 
+
                     </div>
+
+                </div>
+            </form>
+            <form class="subscription-section" th:method="POST"
+                  th:action="@{/client/subscription/cancel}"
+
+            >
+
+                <h3 class="section-title">Cancel Subscription</h3>
+                <div class="subscription-actions">
+
+                    <select id="cancel-subscription-dropdown" class="subscription-dropdown"
+                            name="subscriptionId" required>
+                        <option value="">-- Select a subscription to cancel --</option>
+                        <option th:each="sub : ${clientSubs}"
+                                th:value="${sub.id}"
+                                th:text="|${sub.namePackage} -
+                                      Price: ${sub.price} -
+                                      Expires On: ${#temporals.format(sub.expired, 'dd/MM/yyyy')}|">
+                        </option>
+                    </select>
+                    <div>
+                    <button type="submit" id="cancel-button" class="cancel-button renew-button">
+                        Cancel Subscription
+                    </button>
+                    </div>
+
 
                 </div>
             </form>
@@ -69,6 +97,6 @@
     </footer>
 </div>
 
-<script th:src="@{js/client-profile.js}"></script>
+<!--<script th:src="@{js/client-profile.js}"></script>-->
 </body>
 </html>

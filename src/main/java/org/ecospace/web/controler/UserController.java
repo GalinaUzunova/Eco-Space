@@ -10,6 +10,7 @@ import org.ecospace.security.AuthenticationMetadata;
 import org.ecospace.service.ProductServiceImpl;
 import org.ecospace.service.SubscriptionServiceImpl;
 import org.ecospace.service.UserServiceImpl;
+import org.ecospace.utility.CancelSubsUtill;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,6 +31,8 @@ public class UserController {
     private final UserServiceImpl userService;
     private final SubscriptionServiceImpl subscriptionService;
     private final ProductServiceImpl productService;
+
+    private final CancelSubsUtill cancelSubsUtill;
 
 
     @ModelAttribute("subscriptionDto")
@@ -53,11 +56,12 @@ public class UserController {
     }
 
  @Autowired
-    public UserController(UserServiceImpl userService, SubscriptionServiceImpl subscriptionService, ProductServiceImpl productService) {
+    public UserController(UserServiceImpl userService, SubscriptionServiceImpl subscriptionService, ProductServiceImpl productService, CancelSubsUtill cancelSubsUtill) {
         this.userService = userService;
         this.subscriptionService = subscriptionService;
         this.productService = productService;
 
+     this.cancelSubsUtill = cancelSubsUtill;
  }
 
     @GetMapping("/register")
@@ -125,6 +129,13 @@ public class UserController {
         return "redirect:/renew/" + id;
 
     }
+    @PostMapping("/client/subscription/cancel")
+    public String cancelSubscription(@RequestParam UUID subscriptionId,@AuthenticationPrincipal AuthenticationMetadata user,RedirectAttributes redirectAttributes ){
+
+       this.cancelSubsUtill.cancelSubscription(user,subscriptionId,redirectAttributes);
+        return "redirect:/client";
+
+    }
 
     @PreAuthorize("hasRole('CLIENT')")
     @GetMapping("/payment/{id}")
@@ -154,9 +165,7 @@ public class UserController {
         }
 
 
-//        String payFastUrl = userService.initiatePayment(authenticationMetadata, id);
-//
-//        return "redirect:" + payFastUrl;
+
     }
 
     @PreAuthorize("hasRole('CLIENT')")

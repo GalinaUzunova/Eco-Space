@@ -17,6 +17,7 @@ import org.ecospace.security.AuthenticationMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.jpa.domain.AbstractAuditable_;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -24,6 +25,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -171,12 +173,12 @@ public class UserServiceImpl implements UserDetailsService {
         boolean paymentVerified = payFastService.verifyPayment(payFastData);
 
         if (!paymentVerified) {
-            System.out.println("Error: Payment verification failed " );
+            System.out.println("Error: Payment verification failed ");
             throw new PaymentException("Payment verification failed");
         }
         String[] orderParts = merchantOrderId.split("-");
         if (orderParts.length < 3) {
-            System.out.println("Error: Invalid order ID format" );
+            System.out.println("Error: Invalid order ID format");
             throw new PaymentException("Invalid order ID format");
         }
         UUID userId = UUID.fromString(orderParts[1]);
@@ -307,9 +309,39 @@ public class UserServiceImpl implements UserDetailsService {
 
         return expiresOn;
     }
+    @Transactional
+    @CacheEvict(value = "users", allEntries = true)
+    public void cancelSubscription(@AuthenticationPrincipal AuthenticationMetadata metadata, UUID subscriptionId) {
+        List<Product> userSubs = this.userRepository.findUserSubs(metadata.getId());
+        Optional<User> user = userRepository.findById(metadata.getId());
 
+        if (user.isEmpty()) {
+            throw new RuntimeException("User not found!");
+        }
 
+        boolean hasSubscription = userSubs.stream()
+                .anyMatch(s -> s.getId().equals(subscriptionId));
+
+        if (!hasSubscription) {
+            throw new RuntimeException("Subscription not found for this user!");
+        }
+
+        Optional<Product> product = productRepository.findById(subscriptionId);
+
+        if (product.isEmpty()) {
+            throw new RuntimeException("Product not found!");
+        }
+
+        user.get().getProductList().remove(product.get());
+        userRepository.save(user.get());
+        productRepository.deleteById(subscriptionId);
+
+    }
 }
+
+
+
+
 
 
 

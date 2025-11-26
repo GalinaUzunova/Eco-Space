@@ -203,10 +203,14 @@
             }
         }
     </style>
+
 </head>
 <body>
 <div class="container">
     <div class="header">
+        <nav id="nav-container"  th:replace="~{fragments/admin::nav}">
+
+        </nav>
         <h1>📨 Contact Messages</h1>
         <p>View and manage all contact form submissions</p>
     </div>
