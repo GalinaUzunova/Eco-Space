@@ -74,13 +74,13 @@ public class ProductServiceImpl {
         }
     }
 
-    @Scheduled(fixedRate = 3600000) // Every hour
+    @Scheduled(fixedRate = 3600000)
     @Transactional
     public void deleteExpiredSubscriptions() {
         LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
 
         List<Product> expiredProducts = productRepository
-                .findAllByExpiredBeforeAndActiveTrue(sevenDaysAgo);
+                .findAllExpiredBefore(sevenDaysAgo);
 
         if (!expiredProducts.isEmpty()) {
 

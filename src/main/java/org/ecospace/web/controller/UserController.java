@@ -1,4 +1,4 @@
-package org.ecospace.web.controler;
+package org.ecospace.web.controller;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -28,9 +28,12 @@ import java.util.UUID;
 @Slf4j
 @Controller
 public class UserController {
-    private final UserServiceImpl userService;
+
     private final SubscriptionServiceImpl subscriptionService;
     private final ProductServiceImpl productService;
+
+    private final UserServiceImpl userServiceImpl;
+
 
     private final CancelSubsUtill cancelSubsUtill;
 
@@ -56,10 +59,12 @@ public class UserController {
     }
 
     @Autowired
-    public UserController(UserServiceImpl userService, SubscriptionServiceImpl subscriptionService, ProductServiceImpl productService, CancelSubsUtill cancelSubsUtill) {
-        this.userService = userService;
+    public UserController(SubscriptionServiceImpl subscriptionService, ProductServiceImpl productService, UserServiceImpl userServiceImpl, CancelSubsUtill cancelSubsUtill) {
+
         this.subscriptionService = subscriptionService;
         this.productService = productService;
+        this.userServiceImpl = userServiceImpl;
+
 
         this.cancelSubsUtill = cancelSubsUtill;
     }
@@ -79,7 +84,7 @@ public class UserController {
             return "register";
         }
 
-        if (userService.userExists(userDto)) {
+        if (userServiceImpl.userExists(userDto)) {
             bindingResult.rejectValue("username", "error.userDto", "Username already exists");
             return "register";
         }
@@ -91,7 +96,7 @@ public class UserController {
         }
 
 
-        userService.userRegister(userDto);
+        userServiceImpl.userRegister(userDto);
         return "redirect:/login?success";
     }
 
@@ -106,8 +111,8 @@ public class UserController {
 
     @GetMapping("/client")
     public String viewClient(@AuthenticationPrincipal AuthenticationMetadata authenticationPrinciple, Model model) {
-        User user = userService.byId(authenticationPrinciple.getId());
-        List<Product> clientSubs = this.userService.getClientSubs(authenticationPrinciple.getId());
+        User user = userServiceImpl.byId(authenticationPrinciple.getId());
+        List<Product> clientSubs = this.userServiceImpl.getClientSubs(authenticationPrinciple.getId());
         model.addAttribute("clientSubs", clientSubs);
         model.addAttribute("user", user);
         model.addAttribute("currentPage", "client");
@@ -148,24 +153,18 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('CLIENT')")
-    @PostMapping("/payment/{id}")
-    public String initiatePayment(@PathVariable("id") UUID id, @AuthenticationPrincipal AuthenticationMetadata authenticationMetadata, RedirectAttributes redirectAttributes) {
+    @PostMapping("payment/initiate/{id}")
+    public String initiatePayment(@PathVariable("id") UUID id,
+                                  @AuthenticationPrincipal AuthenticationMetadata authenticationMetadata,
+                                  RedirectAttributes redirectAttributes) {
+        log.info("Initiating payment for subscription: {}, user: {}", id, authenticationMetadata.getId());
 
-        try {
-            System.out.println("=== CONTROLLER: INITIATE PAYMENT ===");
-            String payFastUrl = userService.initiatePayment(authenticationMetadata, id);
-            System.out.println("Redirecting to: " + payFastUrl);
-            return "redirect:" + payFastUrl;
+        String stripeCheckoutUrl = userServiceImpl.initiatePayment(authenticationMetadata, id);
 
-        } catch (Exception e) {
-            System.out.println("=== CONTROLLER ERROR ===");
-            System.out.println("Error: " + e.getMessage());
-            e.printStackTrace();
-            redirectAttributes.addFlashAttribute("errorMessage", "Error: " + e.getMessage());
-            return "redirect:/payment/error";
-        }
-
+        log.info("Redirecting to Stripe checkout");
+        return "redirect:" + stripeCheckoutUrl;
     }
+
 
     @PreAuthorize("hasRole('CLIENT')")
     @PostMapping("/renew/{id}")
@@ -175,8 +174,8 @@ public class UserController {
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.cardDto", bindingResult);
             return "redirect:/renew/" + id;
         }
-        this.userService.renew(metadata, cardDto, id);
-        return "successes";
+        userServiceImpl.renew(metadata, cardDto, id);
+        return "success";
 
     }
 
@@ -190,7 +189,7 @@ public class UserController {
 
     @GetMapping("/edit-profile/update/{id}")
     public String viewProfile(@PathVariable("id") UUID id, Model model) {
-        User user = this.userService.byId(id);
+        User user = this.userServiceImpl.byId(id);
         ProfileDto editProfile = ProfileDtoMapper.fromUser(user);
         model.addAttribute("user", user);
         model.addAttribute("editProfile", editProfile);
@@ -202,12 +201,12 @@ public class UserController {
     public String editProfile(@PathVariable("id") UUID id, @AuthenticationPrincipal AuthenticationMetadata authenticationMetadata, @Valid ProfileDto editProfile, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
 
-            User user = userService.byId(id);
+            User user = userServiceImpl.byId(id);
             model.addAttribute("user", user);
 
             return "redirect:/edit-profile";
         }
-        this.userService.editProfile(editProfile, authenticationMetadata);
+        this.userServiceImpl.editProfile(editProfile, authenticationMetadata);
         String role = authenticationMetadata.getRole().toString();
         if (role.equals("ADMIN")) {
             return "redirect:/manager";
@@ -216,6 +215,7 @@ public class UserController {
     }
 
 }
+
 
 
 

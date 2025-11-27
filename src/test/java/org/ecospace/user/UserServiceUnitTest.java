@@ -8,7 +8,6 @@ import org.ecospace.model.dto.UserDto;
 import org.ecospace.repository.ProductRepository;
 import org.ecospace.repository.UserRepository;
 import org.ecospace.security.AuthenticationMetadata;
-import org.ecospace.service.PayFastService;
 import org.ecospace.service.SubscriptionServiceImpl;
 import org.ecospace.service.UserServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -37,8 +36,7 @@ public class UserServiceUnitTest {
     private SubscriptionServiceImpl subscriptionService;
     @Mock
     private ProductRepository productRepository;
-    @Mock
-    private PayFastService payFastService;
+
     @Mock
     private AuthenticationMetadata authenticationMetadata;
 

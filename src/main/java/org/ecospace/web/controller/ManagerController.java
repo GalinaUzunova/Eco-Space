@@ -1,4 +1,4 @@
-package org.ecospace.web.controler;
+package org.ecospace.web.controller;
 
 import org.ecospace.model.User;
 import org.ecospace.security.AuthenticationMetadata;

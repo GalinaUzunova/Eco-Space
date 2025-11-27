@@ -1,15 +1,3 @@
-payfast:
-  merchant:
-    id:  10000100
-    key: 46f0cd694581a
-    passphrase: jt7NOE43FZPn
-  return:
-    url: http://localhost:8084/payment/success
-  cancel:
-    url: http://localhost:8084/payment/cancel
-  notify:
-    url: http://localhost:8084/payment/notify
-  test-mode: true
 
 
 spring:

@@ -1,4 +1,4 @@
-package org.ecospace.web.controler;
+package org.ecospace.web.controller;
 
 
 import jakarta.validation.Valid;

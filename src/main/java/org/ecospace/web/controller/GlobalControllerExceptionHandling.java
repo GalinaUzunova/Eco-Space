@@ -1,4 +1,4 @@
-package org.ecospace.web.controler;
+package org.ecospace.web.controller;
 
 import org.ecospace.exception.*;
 import org.springframework.http.HttpStatus;
