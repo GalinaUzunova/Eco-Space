@@ -155,8 +155,8 @@ public class UserController {
     @PreAuthorize("hasRole('CLIENT')")
     @PostMapping("payment/initiate/{id}")
     public String initiatePayment(@PathVariable("id") UUID id,
-                                  @AuthenticationPrincipal AuthenticationMetadata authenticationMetadata,
-                                  RedirectAttributes redirectAttributes) {
+                                  @AuthenticationPrincipal AuthenticationMetadata authenticationMetadata
+                                 ) {
         log.info("Initiating payment for subscription: {}, user: {}", id, authenticationMetadata.getId());
 
         String stripeCheckoutUrl = userServiceImpl.initiatePayment(authenticationMetadata, id);

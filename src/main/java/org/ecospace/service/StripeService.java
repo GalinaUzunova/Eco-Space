@@ -5,13 +5,14 @@ import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
-
+@Slf4j
 @Service
 public class StripeService {
 
@@ -30,21 +31,14 @@ public class StripeService {
     @PostConstruct
     public void init() {
         Stripe.apiKey = secretKey;
-        System.out.println("✅ Stripe initialized successfully with version 24.0.0");
+        log.info("✅ Stripe initialized successfully with version 24.0.0");
     }
 
-    /**
-     * Create a Stripe Checkout Session for one-time payment
-     */
+
     public String createCheckoutSession(BigDecimal amount, String productName,
                                         String orderId, String customerEmail) {
         try {
-            System.out.println("=== CREATING STRIPE CHECKOUT SESSION ===");
-            System.out.println("Product: " + productName);
-            System.out.println("Amount: " + amount + " " + currency);
-            System.out.println("Order ID: " + orderId);
 
-            // Build the line item
             SessionCreateParams.LineItem lineItem = SessionCreateParams.LineItem.builder()
                     .setQuantity(1L)
                     .setPriceData(
@@ -60,50 +54,42 @@ public class StripeService {
                     )
                     .build();
 
-            // Build the session parameters
             SessionCreateParams.Builder paramsBuilder = SessionCreateParams.builder()
                     .setMode(SessionCreateParams.Mode.PAYMENT)
                     .setSuccessUrl(successUrl + "?session_id={CHECKOUT_SESSION_ID}")
-                    .setCancelUrl(cancelUrl + "?order_id=" + orderId)
+                    .setCancelUrl(cancelUrl + "?session_id={CHECKOUT_SESSION_ID}")
                     .addLineItem(lineItem)
                     .putMetadata("order_id", orderId)
                     .putMetadata("product_name", productName);
 
-            // Add customer email if provided
+
             if (customerEmail != null && !customerEmail.trim().isEmpty()) {
                 paramsBuilder.setCustomerEmail(customerEmail);
-                System.out.println("Customer email: " + customerEmail);
+
             }
 
-            // Create the session
+
             Session session = Session.create(paramsBuilder.build());
             String checkoutUrl = session.getUrl();
 
-            System.out.println("✅ Stripe Session Created");
-            System.out.println("Session ID: " + session.getId());
-            System.out.println("Checkout URL: " + checkoutUrl);
+           log.info("✅ Stripe Session Created");
+           log.info("Session ID: " + session.getId());
+          log.info("Checkout URL: " + checkoutUrl);
 
             return checkoutUrl;
 
         } catch (StripeException e) {
-            System.err.println("❌ Stripe Error: " + e.getMessage());
+          log.error("❌ Stripe Error: " + e.getMessage());
             throw new RuntimeException("Failed to create Stripe checkout session: " + e.getMessage(), e);
         }
     }
 
-    /**
-     * Verify if payment was successful
-     */
     public boolean verifyPayment(String sessionId) {
         try {
-            System.out.println("=== VERIFYING PAYMENT ===");
-            System.out.println("Session ID: " + sessionId);
+
 
             Session session = Session.retrieve(sessionId);
             String paymentStatus = session.getPaymentStatus();
-
-            System.out.println("Payment Status: " + paymentStatus);
-            System.out.println("Session Status: " + session.getStatus());
 
             boolean isPaid = "paid".equalsIgnoreCase(paymentStatus);
             System.out.println("Payment Verified: " + isPaid);
@@ -111,14 +97,12 @@ public class StripeService {
             return isPaid;
 
         } catch (StripeException e) {
-            System.err.println("❌ Payment verification failed: " + e.getMessage());
+          log.error("❌ Payment verification failed: " + e.getMessage());
             throw new RuntimeException("Payment verification failed: " + e.getMessage(), e);
         }
     }
 
-    /**
-     * Get payment details
-     */
+
     public Map<String, Object> getPaymentDetails(String sessionId) {
         try {
             Session session = Session.retrieve(sessionId);
