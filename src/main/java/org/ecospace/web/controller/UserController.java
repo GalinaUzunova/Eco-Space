@@ -156,7 +156,7 @@ public class UserController {
     @PostMapping("payment/initiate/{id}")
     public String initiatePayment(@PathVariable("id") UUID id,
                                   @AuthenticationPrincipal AuthenticationMetadata authenticationMetadata
-                                 ) {
+    ) {
         log.info("Initiating payment for subscription: {}, user: {}", id, authenticationMetadata.getId());
 
         String stripeCheckoutUrl = userServiceImpl.initiatePayment(authenticationMetadata, id);
@@ -168,16 +168,14 @@ public class UserController {
 
     @PreAuthorize("hasRole('CLIENT')")
     @PostMapping("/renew/{id}")
-    public String renewProduct(@PathVariable("id") UUID id, @Valid UserCardDto cardDto, BindingResult bindingResult, RedirectAttributes redirectAttributes, @AuthenticationPrincipal AuthenticationMetadata metadata) {
-        if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("cardDto", cardDto);
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.cardDto", bindingResult);
-            return "redirect:/renew/" + id;
-        }
-        userServiceImpl.renew(metadata, cardDto, id);
-        return "success";
+    public String renewProduct(@PathVariable("id") UUID productId, @AuthenticationPrincipal AuthenticationMetadata metadata) {
+
+        String stripeUrl = userServiceImpl.initiateRenewPayment(metadata, productId);
+        return "redirect:" + stripeUrl;
+
 
     }
+
 
     @PreAuthorize("hasRole('CLIENT')")
     @GetMapping("/renew/{id}")
@@ -198,7 +196,8 @@ public class UserController {
     }
 
     @PutMapping("/edit-profile/update/{id}")
-    public String editProfile(@PathVariable("id") UUID id, @AuthenticationPrincipal AuthenticationMetadata authenticationMetadata, @Valid ProfileDto editProfile, BindingResult bindingResult, Model model) {
+    public String editProfile(@PathVariable("id") UUID id, @AuthenticationPrincipal AuthenticationMetadata
+            authenticationMetadata, @Valid ProfileDto editProfile, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
 
             User user = userServiceImpl.byId(id);

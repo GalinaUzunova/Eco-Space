@@ -7,7 +7,6 @@ import org.ecospace.model.Subscription;
 import org.ecospace.model.User;
 import org.ecospace.model.UserRole;
 import org.ecospace.model.dto.ProfileDto;
-import org.ecospace.model.dto.UserCardDto;
 import org.ecospace.model.dto.UserDto;
 import org.ecospace.repository.ProductRepository;
 import org.ecospace.repository.UserRepository;
@@ -103,31 +102,6 @@ public class UserServiceImpl implements UserDetailsService {
     }
 
 
-    @Transactional
-    @CacheEvict(value = "products", allEntries = true)
-    public void renew(@AuthenticationPrincipal AuthenticationMetadata authenticationMetadata, UserCardDto cardDto, UUID id) {
-
-        Optional<User> user = userRepository.findById(authenticationMetadata.getId());
-        if (user.isEmpty()) {
-            throw new UserNotFoundException("Not Authorized operation");
-
-        }
-        Product product = this.userRepository.findUserSubs(authenticationMetadata.getId())
-                .stream()
-                .filter(p -> p.getId().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new ProductNotFound("Product with id " + id + " not found"));
-
-        product.setActive(true);
-        product.setCreatedOn(LocalDateTime.now());
-        product.setExpired(createSubscriptionPeriod(product.getNamePackage()));
-        this.productRepository.save(product);
-        user.get().setNotified(false);
-        userRepository.save(user.get());
-
-    }
-
-
     @Cacheable("users")
     public List<User> getAllUsersAndSubs() {
         if (this.userRepository.findAllByAndProductList() != null) {
@@ -191,122 +165,6 @@ public class UserServiceImpl implements UserDetailsService {
         this.userRepository.save(user);
     }
 
-    @Transactional
-    public String initiatePayment(@AuthenticationPrincipal AuthenticationMetadata authenticationMetadata,
-                                  UUID subscriptionId) {
-
-
-        UUID userId = authenticationMetadata.getId();
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
-
-        Subscription subscription = subscriptionService.byId(subscriptionId);
-
-        String merchantOrderId = "ECO-" + userId + "-" + subscriptionId + "-" + System.currentTimeMillis();
-
-
-        user.setPendingPaymentOrderId(merchantOrderId);
-        user.setSetPendingSubscriptionId(subscriptionId);
-        userRepository.save(user);
-
-        System.out.println("Stored pending payment: " + merchantOrderId);
-
-        try {
-
-            String stripeUrl = stripeService.createCheckoutSession(
-                    BigDecimal.valueOf(subscription.getPrice()),
-                    subscription.getNamePackage(),
-                    merchantOrderId,
-                    user.getEmail() != null ? user.getEmail() : "customer@example.com"
-            );
-
-            log.info("✅ Stripe payment initiated successfully");
-            return stripeUrl;
-
-        } catch (Exception e) {
-            log.error("❌ Stripe payment initiation failed: " + e.getMessage());
-
-            user.setPendingPaymentOrderId(null);
-            user.setSetPendingSubscriptionId(null);
-            userRepository.save(user);
-
-            throw new PaymentException("Failed to initiate payment: " + e.getMessage());
-        }
-    }
-
-    @Transactional
-    @CacheEvict(value = {"products", "users"}, allEntries = true)
-    public boolean completePayment(String sessionId) {
-
-        try {
-
-            boolean paymentVerified = stripeService.verifyPayment(sessionId);
-
-            if (!paymentVerified) {
-                return false;
-            }
-
-            Map<String, Object> paymentDetails = stripeService.getPaymentDetails(sessionId);
-
-            Map<String, String> metadata = extractMetadataSafely(paymentDetails);
-            String merchantOrderId = metadata.get("order_id");
-
-            log.info("Extracted Order ID: " + merchantOrderId);
-
-            processPaymentCompletion(merchantOrderId);
-            return true;
-
-        } catch (Exception e) {
-            log.info("❌ ERROR in payment completion: " + e.getMessage());
-
-            throw new PaymentException("Failed to complete payment: " + e.getMessage());
-        }
-    }
-
-    private void processPaymentCompletion(String merchantOrderId) {
-
-        log.info("Merchant Order ID: " + merchantOrderId);
-
-        try {
-
-            String[] orderParts = merchantOrderId.split("-");
-
-            if (orderParts.length < 6) {
-                log.error("❌ Invalid order ID format. Expected at least 6 parts, got: " + orderParts.length);
-                throw new PaymentException("Invalid order ID format");
-            }
-
-            String userIdStr = orderParts[1] + "-" + orderParts[2] + "-" + orderParts[3] + "-" + orderParts[4] + "-" + orderParts[5];
-
-            String subscriptionIdStr = orderParts[6] + "-" + orderParts[7] + "-" + orderParts[8] + "-" + orderParts[9] + "-" + orderParts[10];
-
-            UUID userId = UUID.fromString(userIdStr);
-            UUID subscriptionId = UUID.fromString(subscriptionIdStr);
-
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new UserNotFoundException("User not found"));
-
-            Subscription subscription = subscriptionService.byId(subscriptionId);
-            if (!merchantOrderId.equals(user.getPendingPaymentOrderId()) ||
-                    !subscriptionId.equals(user.getSetPendingSubscriptionId())) {
-                log.error("Payment order ID mismatch. Expected: {}, Got: {}",
-                        user.getPendingPaymentOrderId(), merchantOrderId);
-                throw new PaymentException("Payment order ID mismatch");
-            }
-
-            createAndAssignProduct(subscription, user);
-            user.setPendingPaymentOrderId(null);
-            user.setSetPendingSubscriptionId(null);
-            userRepository.save(user);
-
-            log.info("✅ Payment processing completed successfully");
-
-        } catch (Exception e) {
-            log.error("❌ Error in processPaymentCompletion: " + e.getMessage());
-            throw new PaymentException("Failed to process payment completion: " + e.getMessage());
-        }
-    }
-
 
     private Map<String, String> extractMetadataSafely(Map<String, Object> paymentDetails) {
         Object metadataObj = paymentDetails.get("metadata");
@@ -321,6 +179,170 @@ public class UserServiceImpl implements UserDetailsService {
             }
         }
         return metadata;
+    }
+
+
+    @Transactional
+    public String initiatePayment(@AuthenticationPrincipal AuthenticationMetadata authenticationMetadata,
+                                  UUID subscriptionId) {
+        UUID userId = authenticationMetadata.getId();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        Subscription subscription = subscriptionService.byId(subscriptionId);
+        String merchantOrderId = "ECO-" + userId + "-" + subscriptionId + "-" + System.currentTimeMillis();
+
+        user.setPendingPaymentOrderId(merchantOrderId);
+        user.setSetPendingSubscriptionId(subscriptionId);
+        userRepository.save(user);
+
+        try {
+            String stripeUrl = stripeService.createCheckoutSession(
+                    BigDecimal.valueOf(subscription.getPrice()),
+                    subscription.getNamePackage(),
+                    merchantOrderId,
+                    user.getEmail() != null ? user.getEmail() : "customer@example.com"
+            );
+
+            return stripeUrl;
+        } catch (Exception e) {
+            clearUserPendingPayment(user);
+            throw new PaymentException("Failed to initiate payment: " + e.getMessage());
+        }
+    }
+
+    @CacheEvict(value = "products", allEntries = true)
+    @Transactional
+    public String initiateRenewPayment(@AuthenticationPrincipal AuthenticationMetadata authenticationMetadata,
+                                       UUID productId) {
+        UUID userId = authenticationMetadata.getId();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        Product existingProduct = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFound("Product not found"));
+
+        if (!user.getProductList().contains(existingProduct)) {
+            throw new AccesDeniedException("You don't own this product");
+        }
+
+        String merchantOrderId = "RENEW-" + userId + "-" + productId + "-" + System.currentTimeMillis();
+        user.setPendingPaymentOrderId(merchantOrderId);
+        user.setSetPendingSubscriptionId(productId);
+        userRepository.save(user);
+
+        try {
+            String stripeUrl = stripeService.createCheckoutSession(
+                    BigDecimal.valueOf(existingProduct.getPrice()),
+                    "Renew: " + existingProduct.getNamePackage(),
+                    merchantOrderId,
+                    user.getEmail() != null ? user.getEmail() : "customer@example.com"
+            );
+            log.info("✅ Renewal payment initiated successfully for product: {}", productId);
+            return stripeUrl;
+        } catch (Exception e) {
+            clearUserPendingPayment(user);
+            throw new PaymentException("Failed to initiate renewal payment: " + e.getMessage());
+        }
+    }
+
+    @Transactional
+    @CacheEvict(value = {"products", "users"}, allEntries = true)
+    public boolean completePayment(String sessionId) {
+        try {
+            boolean paymentVerified = stripeService.verifyPayment(sessionId);
+            if (!paymentVerified) {
+                return false;
+            }
+
+            Map<String, Object> paymentDetails = stripeService.getPaymentDetails(sessionId);
+            Map<String, String> metadata = extractMetadataSafely(paymentDetails);
+            String merchantOrderId = metadata.get("order_id");
+
+            if (merchantOrderId == null) {
+                log.error("❌ No order_id found in payment metadata");
+                return false;
+            }
+
+            processPaymentCompletion(merchantOrderId);
+            return true;
+        } catch (Exception e) {
+            log.error("❌ ERROR in payment completion: {}", e.getMessage());
+            throw new PaymentException("Failed to complete payment: " + e.getMessage());
+        }
+    }
+
+    private void processPaymentCompletion(String merchantOrderId) {
+        try {
+            if (merchantOrderId.startsWith("RENEW-")) {
+                processRenewalPayment(merchantOrderId);
+            } else if (merchantOrderId.startsWith("ECO-")) {
+                processNewSubscriptionPayment(merchantOrderId);
+            } else {
+                throw new PaymentException("Invalid order ID format");
+            }
+        } catch (Exception e) {
+            throw new PaymentException("Failed to process payment completion: " + e.getMessage());
+        }
+    }
+
+    private void processRenewalPayment(String merchantOrderId) {
+        PaymentIds ids = extractPaymentIds(merchantOrderId);
+        User user = userRepository.findById(ids.userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        Product product = productRepository.findById(ids.targetId)
+                .orElseThrow(() -> new ProductNotFound("Product not found"));
+
+        validatePendingPayment(user, merchantOrderId, ids.targetId);
+
+
+        product.setExpired(createSubscriptionPeriod(product.getNamePackage()));
+        product.setActive(true);
+        productRepository.save(product);
+
+        clearUserPendingPayment(user);
+        userRepository.save(user);
+        log.info("✅ Subscription renewed for product: {}", ids.targetId);
+    }
+
+    private void processNewSubscriptionPayment(String merchantOrderId) {
+        PaymentIds ids = extractPaymentIds(merchantOrderId);
+        User user = userRepository.findById(ids.userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        Subscription subscription = subscriptionService.byId(ids.targetId);
+        validatePendingPayment(user, merchantOrderId, ids.targetId);
+
+        createAndAssignProduct(subscription, user);
+        clearUserPendingPayment(user);
+        userRepository.save(user);
+        log.info("✅ New subscription created for user: {}", ids.userId);
+    }
+
+
+    private PaymentIds extractPaymentIds(String merchantOrderId) {
+        String[] parts = merchantOrderId.split("-");
+        if (parts.length < 11) {
+            throw new PaymentException("Invalid order ID format");
+        }
+
+        String userIdStr = parts[1] + "-" + parts[2] + "-" + parts[3] + "-" + parts[4] + "-" + parts[5];
+        String targetIdStr = parts[6] + "-" + parts[7] + "-" + parts[8] + "-" + parts[9] + "-" + parts[10];
+
+        return new PaymentIds(UUID.fromString(userIdStr), UUID.fromString(targetIdStr));
+    }
+
+    private void validatePendingPayment(User user, String merchantOrderId, UUID expectedId) {
+        if (!merchantOrderId.equals(user.getPendingPaymentOrderId()) ||
+                !expectedId.equals(user.getSetPendingSubscriptionId())) {
+            throw new PaymentException("Payment order ID mismatch");
+        }
+    }
+
+    private void clearUserPendingPayment(User user) {
+        user.setPendingPaymentOrderId(null);
+        user.setSetPendingSubscriptionId(null);
     }
 
 
@@ -405,43 +427,35 @@ public class UserServiceImpl implements UserDetailsService {
         }
     }
 
-        @Transactional
-        public void clearPendingPaymentByOrderId (String merchantOrderId){
-            try {
-                String[] orderParts = merchantOrderId.split("-");
-                if (orderParts.length >= 6) {
-                    String userIdStr = orderParts[1] + "-" + orderParts[2] + "-" + orderParts[3] + "-" + orderParts[4] + "-" + orderParts[5];
-                    UUID userId = UUID.fromString(userIdStr);
-
-                    User user = userRepository.findById(userId)
-                            .orElseThrow(() -> new UserNotFoundException("User not found"));
-
-                    if (merchantOrderId.equals(user.getPendingPaymentOrderId())) {
-                        user.setPendingPaymentOrderId(null);
-                        user.setSetPendingSubscriptionId(null);
-                        userRepository.save(user);
-                        log.info("✅ Cleared pending payment for order: {}", merchantOrderId);
-                    }
-                }
-            } catch (Exception e) {
-                log.error("❌ Failed to clear pending payment for order: {}", merchantOrderId, e);
-            }
-        }
-
     @Transactional
-    public void clearPendingPaymentForUser(UUID userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+    public void clearPendingPaymentByOrderId(String merchantOrderId) {
+        try {
+            String[] orderParts = merchantOrderId.split("-");
+            if (orderParts.length >= 6) {
+                String userIdStr = orderParts[1] + "-" + orderParts[2] + "-" + orderParts[3] + "-" + orderParts[4] + "-" + orderParts[5];
+                UUID userId = UUID.fromString(userIdStr);
 
-        String oldOrderId = user.getPendingPaymentOrderId();
-        user.setPendingPaymentOrderId(null);
-        user.setSetPendingSubscriptionId(null);
-        userRepository.save(user);
+                User user = userRepository.findById(userId)
+                        .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        log.info("✅ Cleared pending payment for user: {}, previous order: {}", userId, oldOrderId);
+                if (merchantOrderId.equals(user.getPendingPaymentOrderId())) {
+                    user.setPendingPaymentOrderId(null);
+                    user.setSetPendingSubscriptionId(null);
+                    userRepository.save(user);
+                    log.info("✅ Cleared pending payment for order: {}", merchantOrderId);
+                }
+            }
+        } catch (Exception e) {
+            log.error("❌ Failed to clear pending payment for order: {}", merchantOrderId, e);
+        }
     }
 
+
+    private record PaymentIds(UUID userId, UUID targetId) {
     }
+
+
+}
 
 
 
