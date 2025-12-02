@@ -2,12 +2,16 @@ package org.ecospace.user;
 
 import org.ecospace.exception.UserNotFoundException;
 import org.ecospace.model.Product;
+import org.ecospace.model.Subscription;
+import org.ecospace.model.SubscriptionType;
 import org.ecospace.model.User;
 import org.ecospace.model.dto.ProfileDto;
 import org.ecospace.model.dto.UserDto;
 import org.ecospace.repository.ProductRepository;
+import org.ecospace.repository.SubscriptionRepository;
 import org.ecospace.repository.UserRepository;
 import org.ecospace.security.AuthenticationMetadata;
+import org.ecospace.service.StripeService;
 import org.ecospace.service.SubscriptionServiceImpl;
 import org.ecospace.service.UserServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -18,10 +22,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+
+
+import java.util.*;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -39,6 +44,9 @@ public class UserServiceUnitTest {
 
     @Mock
     private AuthenticationMetadata authenticationMetadata;
+    @Mock
+    private StripeService stripeService;
+
 
 
     @InjectMocks
@@ -106,7 +114,7 @@ public class UserServiceUnitTest {
     }
 
     @Test
-    void getClientSubscriptions_whenClientNotExsist() {
+    void getClientSubscriptions_whenClientNotExist() {
         UUID userId = UUID.randomUUID();
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
@@ -141,9 +149,9 @@ public class UserServiceUnitTest {
 
 
     @Test
-    void editUserProfile_whenUserIdNotFound_thenThrowException(){
+    void editUserProfile_whenUserIdNotFound_thenThrowException() {
 
-        UUID userId=UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
         ProfileDto dto = new ProfileDto(userId, "Nik",
                 "nik@abv",
                 "www.unsplash",
@@ -152,12 +160,85 @@ public class UserServiceUnitTest {
         when(authenticationMetadata.getId()).thenReturn(userId);
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        assertThrows(UsernameNotFoundException.class,()-> userService.editProfile(dto,authenticationMetadata));
+        assertThrows(UsernameNotFoundException.class, () -> userService.editProfile(dto, authenticationMetadata));
 
         verify(userRepository).findById(userId);
         verify(userRepository, never()).save(any(User.class));
     }
 
+    @Test
+    void completePayment_WhenPaymentVerifiedAndOrderIdInMetadata_ReturnsTrue() {
 
+        String sessionId = "cs_test_123";
+        UUID userId = UUID.randomUUID();
+        UUID subscriptionId = UUID.randomUUID();
+        String orderId = "ECO-" + userId + "-" + subscriptionId + "-123456789";
+
+        User mockUser = User.builder()
+                .username("testuser")
+                .email("test@example.com")
+                .pendingPaymentOrderId(orderId)
+                .setPendingSubscriptionId(subscriptionId)
+                .productList(new ArrayList<>())
+
+                .build();
+
+
+        Subscription mockSubscription = Subscription.builder()
+
+                .namePackage("6-Month Package")
+                .description("""
+                        Everything in Monthly Package
+                        Bi-weekly detailed inspection
+                        Advanced plant care
+                        Soil quality testing
+                        Fertilization service
+                        Pest control management
+                        Seasonal planting""")
+                .price(6000.00)
+                .type(SubscriptionType.MAINTANACE)
+                .build();
+
+
+        when(stripeService.verifyPayment(sessionId)).thenReturn(true);
+
+
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put("order_id", orderId);
+        metadata.put("product_name", "6-Month Package");
+
+        Map<String, Object> paymentDetails = new HashMap<>();
+        paymentDetails.put("metadata", metadata);
+
+        when(stripeService.getPaymentDetails(sessionId)).thenReturn(paymentDetails);
+
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
+        when(subscriptionService.byId(subscriptionId)).thenReturn(mockSubscription);
+
+
+        when(productRepository.save(any(Product.class))).thenAnswer(invocation -> {
+            Product product = invocation.getArgument(0);
+            product.setId(UUID.randomUUID());
+            return product;
+        });
+
+
+        when(userRepository.save(any(User.class))).thenReturn(mockUser);
+
+
+        boolean result = userService.completePayment(sessionId);
+
+
+        assertThat(result).isTrue();
+
+        verify(stripeService).verifyPayment(sessionId);
+        verify(stripeService).getPaymentDetails(sessionId);
+        verify(userRepository).findById(userId);
+        verify(subscriptionService).byId(subscriptionId);
+        verify(productRepository).save(any(Product.class));
+        verify(userRepository,times(2)).save(any(User.class));
+    }
 }
+
 

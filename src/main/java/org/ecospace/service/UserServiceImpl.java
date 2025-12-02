@@ -272,7 +272,7 @@ public class UserServiceImpl implements UserDetailsService {
         }
     }
 
-    private void processPaymentCompletion(String merchantOrderId) {
+    private   void processPaymentCompletion(String merchantOrderId) {
         try {
             if (merchantOrderId.startsWith("RENEW-")) {
                 processRenewalPayment(merchantOrderId);
