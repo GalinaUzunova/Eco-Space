@@ -8,13 +8,10 @@ import org.ecospace.repository.ProductRepository;
 import org.ecospace.repository.SubscriptionRepository;
 import org.ecospace.repository.UserRepository;
 import org.ecospace.security.AuthenticationMetadata;
-import org.ecospace.service.StripeService;
-import org.ecospace.service.SubscriptionServiceImpl;
 import org.ecospace.service.UserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
