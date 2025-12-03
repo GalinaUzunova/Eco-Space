@@ -5,8 +5,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 
-
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -24,13 +22,8 @@ public class Subscription extends BaseEntity {
     @Column(nullable = false)
     private Double price;
 
-    @Column( nullable = false ,columnDefinition = "Blob")
+    @Column(nullable = false, columnDefinition = "Blob")
     private String description;
-
-
-
-
-
 
 
 }

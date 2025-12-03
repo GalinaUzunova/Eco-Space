@@ -12,11 +12,11 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import java.util.List;
 import java.util.UUID;
 
 @Controller
-
 public class SubscriptionController {
 
     private final SubscriptionServiceImpl subscriptionService;
@@ -62,12 +62,12 @@ public class SubscriptionController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/add-subscription")
 
-    public String createSub(@Valid AddSubDto subDto, BindingResult bindingResult,RedirectAttributes redirectAttributes
-           )  {
+    public String createSub(@Valid AddSubDto subDto, BindingResult bindingResult, RedirectAttributes redirectAttributes
+    ) {
 
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("subDto",subDto);
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.subDto",bindingResult);
+            redirectAttributes.addFlashAttribute("subDto", subDto);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.subDto", bindingResult);
 
             return "redirect:add-subscription";
 

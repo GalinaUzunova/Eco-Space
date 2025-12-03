@@ -11,9 +11,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+
 @AllArgsConstructor
 @Data
-public class AuthenticationMetadata implements UserDetails{
+public class AuthenticationMetadata implements UserDetails {
 
     private String username;
     private String password;
@@ -24,7 +25,7 @@ public class AuthenticationMetadata implements UserDetails{
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        SimpleGrantedAuthority grantedAuthority=new SimpleGrantedAuthority( "ROLE_" + role.name());
+        SimpleGrantedAuthority grantedAuthority = new SimpleGrantedAuthority("ROLE_" + role.name());
         return List.of(grantedAuthority);
     }
 
@@ -37,7 +38,6 @@ public class AuthenticationMetadata implements UserDetails{
     public String getUsername() {
         return this.username;
     }
-
 
 
     @Override

@@ -40,22 +40,22 @@ public class GlobalControllerExceptionHandling {
 
         return new ModelAndView("internal-server-error");
     }
+
     @ExceptionHandler(PaymentException.class)
-    public ModelAndView handlePaymentException(){
+    public ModelAndView handlePaymentException() {
 
-        return  new ModelAndView("internal-server-error");
-
-
+        return new ModelAndView("internal-server-error");
 
 
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ModelAndView handleFAilNotification(){
+    public ModelAndView handleFAilNotification() {
         return new ModelAndView("internal-server-error");
 
     }
+
     @ExceptionHandler(Exception.class)
     public ModelAndView handleAllOthersE(Exception e) {
 

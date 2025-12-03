@@ -108,7 +108,7 @@ public class UserController {
         }
         return "login";
     }
-
+    @PreAuthorize("hasRole('CLIENT')")
     @GetMapping("/client")
     public String viewClient(@AuthenticationPrincipal AuthenticationMetadata authenticationPrinciple, Model model) {
         User user = userServiceImpl.byId(authenticationPrinciple.getId());
@@ -121,7 +121,7 @@ public class UserController {
         }
         return "client";
     }
-
+    @PreAuthorize("hasRole('CLIENT')")
     @PostMapping("/client")
     public String getClient(@Valid SubscriptionDtos subscriptionDto, BindingResult bindingResult
             , RedirectAttributes redirectAttributes) {
@@ -134,7 +134,7 @@ public class UserController {
         return "redirect:/renew/" + id;
 
     }
-
+    @PreAuthorize("hasRole('CLIENT')")
     @PostMapping("/client/subscription/cancel")
     public String cancelSubscription(@RequestParam UUID subscriptionId, @AuthenticationPrincipal AuthenticationMetadata user, RedirectAttributes redirectAttributes) {
 
@@ -175,7 +175,6 @@ public class UserController {
 
 
     }
-
 
     @PreAuthorize("hasRole('CLIENT')")
     @GetMapping("/renew/{id}")

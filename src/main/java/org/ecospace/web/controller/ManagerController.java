@@ -53,6 +53,7 @@ public class ManagerController {
 
         return "edit-client";
     }
+
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/edit-client/update/{id}")
     public String changeRole(@PathVariable UUID id) {

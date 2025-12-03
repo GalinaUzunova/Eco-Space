@@ -43,6 +43,7 @@ public class User extends BaseEntity {
     @OneToMany(fetch = FetchType.EAGER )
     private List<Product> productList;
 
+
 }
 
 

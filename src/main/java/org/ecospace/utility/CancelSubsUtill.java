@@ -20,7 +20,6 @@ public class CancelSubsUtill {
 
     }
 
-
     public void cancelSubscription(@AuthenticationPrincipal AuthenticationMetadata metadata, UUID subsId, RedirectAttributes redirectAttributes) {
 
 

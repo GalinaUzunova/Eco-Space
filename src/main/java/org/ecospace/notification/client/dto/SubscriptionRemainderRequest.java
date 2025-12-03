@@ -2,6 +2,7 @@ package org.ecospace.notification.client.dto;
 
 import lombok.Builder;
 import lombok.Data;
+
 import java.time.LocalDateTime;
 
 @Data

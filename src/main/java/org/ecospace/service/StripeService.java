@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+
 @Slf4j
 @Service
 public class StripeService {
@@ -72,14 +73,14 @@ public class StripeService {
             Session session = Session.create(paramsBuilder.build());
             String checkoutUrl = session.getUrl();
 
-           log.info("✅ Stripe Session Created");
-           log.info("Session ID: " + session.getId());
-          log.info("Checkout URL: " + checkoutUrl);
+            log.info("✅ Stripe Session Created");
+            log.info("Session ID: " + session.getId());
+            log.info("Checkout URL: " + checkoutUrl);
 
             return checkoutUrl;
 
         } catch (StripeException e) {
-          log.error("❌ Stripe Error: " + e.getMessage());
+            log.error("❌ Stripe Error: " + e.getMessage());
             throw new RuntimeException("Failed to create Stripe checkout session: " + e.getMessage(), e);
         }
     }
@@ -97,7 +98,7 @@ public class StripeService {
             return isPaid;
 
         } catch (StripeException e) {
-          log.error("❌ Payment verification failed: " + e.getMessage());
+            log.error("❌ Payment verification failed: " + e.getMessage());
             throw new RuntimeException("Payment verification failed: " + e.getMessage(), e);
         }
     }
@@ -123,9 +124,6 @@ public class StripeService {
             throw new RuntimeException("Failed to get payment details: " + e.getMessage(), e);
         }
     }
-
-
-
 
 
 }

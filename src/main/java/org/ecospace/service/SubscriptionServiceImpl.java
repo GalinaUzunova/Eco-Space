@@ -1,4 +1,5 @@
 package org.ecospace.service;
+
 import org.ecospace.exception.SubscriptionNotFoundException;
 import org.ecospace.model.Subscription;
 import org.ecospace.model.SubscriptionType;
@@ -8,6 +9,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +25,7 @@ public class SubscriptionServiceImpl {
 
     @Transactional
     @CacheEvict(value = "subscriptions", allEntries = true)
-    public void addNewSubscription(AddSubDto subDto)  {
+    public void addNewSubscription(AddSubDto subDto) {
 
         Subscription subscription =
                 Subscription.builder()

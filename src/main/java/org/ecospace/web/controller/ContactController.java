@@ -67,6 +67,7 @@ public class ContactController {
         model.addAttribute("todayMessages", todayMessages);
         return "contact-message";
     }
+
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/contact-message/delete/{id}")
     public String deleteMessage(@PathVariable("id") UUID id) {

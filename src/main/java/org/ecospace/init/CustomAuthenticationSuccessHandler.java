@@ -1,7 +1,6 @@
 package org.ecospace.init;
 
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
@@ -16,7 +15,7 @@ public class CustomAuthenticationSuccessHandler implements org.springframework.s
 
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException{
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         String redirectUrl = determineTargetUrl(authorities);
@@ -28,11 +27,11 @@ public class CustomAuthenticationSuccessHandler implements org.springframework.s
     private String determineTargetUrl(Collection<? extends GrantedAuthority> authorities) {
         for (GrantedAuthority authority : authorities) {
 
-            if (authority.getAuthority().equals("ROLE_ADMIN")){
+            if (authority.getAuthority().equals("ROLE_ADMIN")) {
 
                 return "/manager";
 
-            }  else if (authority.getAuthority().equals("ROLE_CLIENT")) {
+            } else if (authority.getAuthority().equals("ROLE_CLIENT")) {
                 return "/client";
             }
         }

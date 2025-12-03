@@ -9,13 +9,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-public interface ProductRepository  extends JpaRepository<Product, UUID > {
+public interface ProductRepository extends JpaRepository<Product, UUID> {
 
-  List<Product>findAllByExpiredBetween(LocalDateTime today, LocalDateTime warningDate);
+    List<Product> findAllByExpiredBetween(LocalDateTime today, LocalDateTime warningDate);
 
-  @Query("SELECT p FROM Product p JOIN FETCH p.user WHERE p.expired < :date")
-  List<Product>findAllExpiredBefore(@Param("date")LocalDateTime date);
-
+    @Query("SELECT p FROM Product p JOIN FETCH p.user WHERE p.expired < :date")
+    List<Product> findAllExpiredBefore(@Param("date") LocalDateTime date);
 
 
 }
